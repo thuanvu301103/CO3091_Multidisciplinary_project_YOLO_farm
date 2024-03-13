@@ -1,5 +1,5 @@
 {
-  "name": "yolo-farmserver",
+  "name": "yolo-farmbe",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -22,12 +22,11 @@
   "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/mongoose": "^10.0.4",
     "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/typeorm": "^10.0.2",
-    "mongodb": "^5.9.2",
+    "mongoose": "^8.2.1",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
