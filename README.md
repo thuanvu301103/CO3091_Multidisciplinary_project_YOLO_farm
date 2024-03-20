@@ -4,3 +4,6 @@
 -  Integrate Adafruit IO's MQTT service: ```npm install mqtt```
 
 ## Integrate Adafruit IO's MQTT service
+- Purpose: listen for feed changes from Adafruit
+- Instruction:
+  + You need to have Adafruit account. In Adafruit dashboard, click "Key" symbol then copy "Username" and "ActiveKey" 
