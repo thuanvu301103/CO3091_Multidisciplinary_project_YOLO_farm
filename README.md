@@ -3,7 +3,8 @@
 ## Install necessary packages using npm
 -  Integrate Adafruit IO's MQTT service: ```npm install mqtt```
 
-## Integrate Adafruit IO's MQTT service
+## Config YOLO-Farm backend server ```yolo-farmbe```
+### Integrate Adafruit IO's MQTT service
 - Purpose: listen for feed changes from Adafruit
 - Precondition:
   + You need to have Adafruit account. In Adafruit dashboard, click "Key" symbol then copy ```Username``` and ```ActiveKey```;
