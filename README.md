@@ -67,3 +67,23 @@
 
     }
     ```
+   + After receiving feed's change, we want user see this change on browser so be-server must send this data imediately to fe-server:
+    ```
+    private async sendFeedChangeToFe(url: string, message: string): Promise<void> {
+        try {
+            const response = await axios.post(url, message);
+            console.log('Data sent successfully:');
+        } catch (error) {
+            if (error.code === 'ECONNREFUSED') {
+                console.error('Connection refused. The server is not reachable.');
+                // Handle the error gracefully, e.g., log it or emit an event
+            } else {
+                console.error('Error sending data:', error);
+                // Handle other types of errors as needed
+            }
+        }
+    }
+    ```
+  Caution:
+  	* Add this method to class ```EnvsenseService``` and call it at comment ```// Handle the message as needed```
+	* Whener using post, I suggest using ```async``` and ```await```. The reasons are quite simple: First, ```async``` makes sending message task executed concurrently without blocking the execution of other tasks; second, ```await``` pauses the execution of the sending message method until a post method is complete, if we do not use ```await```, the method return success and skip "catch (error)" since the message is successfully sent, but if the destination server do not return message, post method will raises error (since we skiped catch pharse) and our be server will be forced to stop. In the other hand, if we use ```await```, the method is paused until post method receives "success" message from destination server; since we still inside try block, if post method raises error, our server wont be stopped since we have catch block to handle this situation.
