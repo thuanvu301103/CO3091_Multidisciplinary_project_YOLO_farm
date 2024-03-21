@@ -112,7 +112,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
 - Query Parameters: use ```@Query```
 #### API for usecase 1: Supervise the plant area
 * Caution: because, be server is run on localhost, sô the url must start with: ```http://127.0.0.1:3000```
-- Get list of plant area of specific user
+- Get list of plant areas of specific user
   + Url: ```/envsense/user/{user_id}/plantarea/list```
   + Successful response format:
     ```
@@ -126,5 +126,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
     		...
     ]
     ```
-
+  + Caution:
+    * Since we have limited hardwware, so we only use feeds from the first plant area in database (find this plant area's information in folder ```yolo-farrmdb```);
+    * ```ma_feed_anh_sang, ma_feed_nhiet_do, ma_feed_do_am``` are corepond to the feed change messages that are send from be to fe server.
 
