@@ -25,7 +25,7 @@
     export {username, activekey, feeds};
     ```
   + Setup mqtt connect: Since mqtt broker use concurrency model and we want our be-server to handle other task while still listening to adafruit-server, we consider defien mqtt broker in constructor:
-    ```
+    ```javascript
     \\ file: envsense.service.ts
     import * as mqtt from 'mqtt';
     import axios from 'axios';
@@ -68,7 +68,7 @@
     }
     ```
    + After receiving feed's change, we want user see this change on browser so be-server must send this data imediately to fe-server:
-    ```
+    ```javascript
     private async sendFeedChangeToFe(url: string, message: string): Promise<void> {
         try {
             const response = await axios.post(url, message);
@@ -87,3 +87,44 @@
   Caution:
   	* Add this method to class ```EnvsenseService``` and call it at comment ```// Handle the message as needed```
 	* Whener using post, I suggest using ```async``` and ```await```. The reasons are quite simple: First, ```async``` makes sending message task executed concurrently without blocking the execution of other tasks; second, ```await``` pauses the execution of the sending message method until a post method is complete, if we do not use ```await```, the method return success and skip "catch (error)" since the message is successfully sent, but if the destination server do not return message, post method will raises error (since we skiped catch pharse) and our be server will be forced to stop. In the other hand, if we use ```await```, the method is paused until post method receives "success" message from destination server; since we still inside try block, if post method raises error, our server wont be stopped since we have catch block to handle this situation.
+### API Doc
+#### About parameter in URL
+In the context of RESTful APIs, the two most common ways to handle dynamic data in routes are through dynamic route parameters and query parameters. These are widely supported and align well with the principles of REST. Let's explore each in more detail:
+- Dynamic Route Parameters:
+  + Dynamic route parameters are an essential part of RESTful routing. They allow for specifying variable parts of the URL path that identify specific resources.
+  + Dynamic route parameters are directly tied to the resource being requested and are often used to represent resource identifiers (e.g., user IDs, post IDs).
+  + They provide a clean and intuitive way to structure URLs, making them easy to read and understand.
+  + Example: /users/:userId - Represents a specific user resource identified by the userId parameter.
+- Query Parameters:
+  + Query parameters are another common way to pass dynamic data in RESTful APIs. They are appended to the URL and provide additional information or filtering criteria for a request.
+  + Query parameters are versatile and can be used for various purposes, such as filtering, sorting, pagination, or providing optional parameters.
+  + They allow for more flexible and complex requests by providing a way to pass multiple parameters in a single request.
+  + Example: /users?sortBy=name - Specifies sorting criteria for the list of users.
+Both dynamic route parameters and query parameters are fully compatible with the principles of REST, and their usage depends on factors such as the nature of the data being passed, the desired URL structure, and the conventions of the API design. REST does not prescribe one over the other, and both are widely used in RESTful API implementations.
+#### About parameter in nestJS
+- Dynamic Route Parameters: use ```@Param``
+  ```javascript
+  @Get('user/:id/plantarea/list')
+    async getListPlantArea(@Param('id') id: string): Promise<any[]> {
+        return this.envsenseService.getListPlantArea(id);
+  }
+  ```
+- Query Parameters: use ```@Query```
+#### API for usecase 1: Supervise the plant area
+* Caution: because, be server is run on localhost, sô the url must start with: ```http://127.0.0.1:3000```
+- Get list of plant area of specific user
+  + Url: ```/envsense/user/{user_id}/plantarea/list```
+  + Successful response format:
+    ```
+    [
+    	{
+        "_id": {plant_area_id: string},
+        "ma_feed_anh_sang": {mqtt_feed_key_1: string},
+        "ma_feed_nhiet_do": {mqtt_feed_key_2: string},
+        "ma_feed_do_am": {mqtt_feed_key_2: string}
+    	},
+    	...
+    ]
+    ```
+
+
