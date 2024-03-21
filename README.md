@@ -11,7 +11,7 @@
   + You need to have a feed to access (in case yu use shared feed from other source, you have to make sure that you are able to read and write to that feed - ask feed's owner to grand you accesses), then copy ```MQTT by key```;
 - Instruction:
   + Create a config file for adafruit variables:
-    ```
+    ```javascript
     // file: config.adafruitenv.ts
     // Adafruit account's Username
     const username = 'your_adafruit_username';
