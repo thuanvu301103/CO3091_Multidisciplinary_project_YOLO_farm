@@ -116,7 +116,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
   + Url: ```/envsense/user/{user_id}/plantarea/list```
   + Successful response format:
     ```
-	[
+    [
  		{
         	"_id": {plant_area_id: string},
         	"ma_feed_anh_sang": {mqtt_feed_key_1: string},
@@ -124,7 +124,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
         	"ma_feed_do_am": {mqtt_feed_key_2: string}
     		},
     		...
-    	]
+    ]
     ```
 
 
