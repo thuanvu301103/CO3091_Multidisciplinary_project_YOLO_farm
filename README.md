@@ -47,7 +47,7 @@
         	// Subscribe to your feed(s)
         	this.mqtt_client.on('connect', () => {
             		for (let i in adafenv.feeds) {
-    				this.mqtt_client.subscribe(i);
+    				this.mqtt_client.subscribe(adafenv.feeds[i]);
             		}
             		console.log('Connected to Adafruit IO MQTT');
     		});
