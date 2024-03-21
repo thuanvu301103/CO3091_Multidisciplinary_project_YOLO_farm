@@ -122,7 +122,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
         	"ma_feed_anh_sang": {mqtt_feed_key_1: string},
         	"ma_feed_nhiet_do": {mqtt_feed_key_2: string},
         	"ma_feed_do_am": {mqtt_feed_key_2: string}
-    		},
+    	},
     		...
     ]
     ```
