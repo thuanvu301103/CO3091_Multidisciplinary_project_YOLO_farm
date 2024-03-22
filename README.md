@@ -130,6 +130,16 @@ Both dynamic route parameters and query parameters are fully compatible with the
   }
   ```
 - Query Parameters: use ```@Query```
+  ```javascript
+  @Get('user/:userid/plantarea/:areaid/history')
+    async getHistoryData(
+        @Query('filter') filter: string,
+        @Query('start_time') start_time: string,
+        @Query('end_time') end_time: string,
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string
+    ) {/*..*/.}
+  ```
 #### API for usecase 1: Supervise the plant area
 * Caution: because, be server is run on localhost, sô the url must start with: ```http://127.0.0.1:3000```
 - Get list of plant areas of specific user
@@ -175,4 +185,24 @@ Both dynamic route parameters and query parameters are fully compatible with the
     		}
 	}
     ]
+    ```
+- Get history of a plant area of specific user to create chart:
+  + Url: 
+    * Getting chart data of current date: ```/envsense/user/{user_id}/plantarea/{area_id}/history?filter=day```
+    * Getting chart data of current month: ```/envsense/user/{user_id}/plantarea/{area_id}/history?filter=month```
+    * Getting chart data between specific dates: ```/envsense/user/{user_id}/plantarea/{area_id}/history?start_time={yyyy-mm-dd}&end_time={yyyy-mm-dd}```
+  + Successful response format:
+    ```
+      {
+         "anh_sang_chart_data": [
+              ["2024-03-16T14:23:48Z","15.0"],
+              ["2024-03-16T14:23:52Z","30.0"],
+	      ...
+	  ],
+         "nhiet_do_chart_data": [
+              ["2024-03-16T14:23:48Z","15.0"],
+              ["2024-03-16T14:23:52Z","30.0"],
+	      ...
+          ]
+      }
     ```

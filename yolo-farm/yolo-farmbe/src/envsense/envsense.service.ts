@@ -205,7 +205,7 @@ export class EnvsenseService {
             });
         let eval_anh_sang = (await this.evaluateVal(ma_feed_anh_sang, curr_anh_sang)).evaluate;
         let chart_data_anh_sang = null;
-        await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_anh_sang}/data/chart?hours=5`)
+        await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_anh_sang}/data/chart?hours=2`)
             .then(response => {
                 //console.log('Response:', response.data);
                 chart_data_anh_sang = response.data.data;
@@ -242,4 +242,24 @@ export class EnvsenseService {
 
         }
     }
+
+    // Get history chart data
+    public async getHistoryData(start_time: string, end_time: string, userid: string, areaid: string) {
+        let feeds = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid}]}, 'ma_feed_anh_sang ma_feed_nhiet_do ma_feed_do_am').exec()
+        let anh_sang_data = null;
+        let nhiet_do_data = null;
+        await axios.get(`https://io.adafruit.com/api/v2/${feeds.ma_feed_anh_sang}/data/chart?start_time=${start_time}&end_time=${end_time}`)
+            .then(response => {
+                anh_sang_data = response.data.data;
+            });
+        await axios.get(`https://io.adafruit.com/api/v2/${feeds.ma_feed_nhiet_do}/data/chart?start_time=${start_time}&end_time=${end_time}`)
+            .then(response => {
+                nhiet_do_data = response.data.data;
+            });
+        return {
+            anh_sang_chart_data: anh_sang_data,
+            nhiet_do_chart_data: nhiet_do_data
+        }
+    }
+
 }
