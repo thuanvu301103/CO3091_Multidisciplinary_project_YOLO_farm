@@ -29,7 +29,7 @@ function App() {
   const [message, setMessage] = useState("");
   useEffect(() => {
     axios
-      .get("https://localhost:3000/temperature")
+      .get("http://127.0.0.1:3000/envsense/user/65f0529c5933e074166715a5/plantarea/65f0529c5933e074166715a8")
       .then((response) => {
         setMessage(response.data);
       })

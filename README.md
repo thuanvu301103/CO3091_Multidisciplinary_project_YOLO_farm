@@ -2,6 +2,14 @@
 
 ## Install necessary packages using npm
 -  Integrate Adafruit IO's MQTT service: ```npm install mqtt```
+- Run web apps concurrently: ```npm install -g concurrently```
+
+## Run the Servers
+Open Terminal
+- Navigate to folder ```yolo-farmbe```, run ```nest start```
+- Wait until the program runs successfully, then open a neww Terminal tab
+- Navigate to folder ```yolo-farmfe```, run ```npm start```. It will ask you to run the fe server on port 3001, please enter ```yes```. 
+- Import all JSON file inside folder (this step is only needed when there is no data in MongoDB server or you want to update the structure)
 
 ## Config YOLO-Farm backend server ```yolo-farmbe```
 ### Integrate Adafruit IO's MQTT service
@@ -190,6 +198,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
   + Url: 
     * Getting chart data of current date: ```/envsense/user/{user_id}/plantarea/{area_id}/history?filter=day```
     * Getting chart data of current month: ```/envsense/user/{user_id}/plantarea/{area_id}/history?filter=month```
+    * Getting chart data of current year: ```/envsense/user/{user_id}/plantarea/{area_id}/history?filter=year```
     * Getting chart data between specific dates: ```/envsense/user/{user_id}/plantarea/{area_id}/history?start_time={yyyy-mm-dd}&end_time={yyyy-mm-dd}```
   + Successful response format:
     ```
@@ -198,7 +207,7 @@ Both dynamic route parameters and query parameters are fully compatible with the
               ["2024-03-16T14:23:48Z","15.0"],
               ["2024-03-16T14:23:52Z","30.0"],
 	      ...
-	  ],
+          ],
          "nhiet_do_chart_data": [
               ["2024-03-16T14:23:48Z","15.0"],
               ["2024-03-16T14:23:52Z","30.0"],
