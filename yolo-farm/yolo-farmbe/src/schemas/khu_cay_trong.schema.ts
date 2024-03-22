@@ -6,6 +6,9 @@ export type Document = HydratedDocument<Khu_cay_trong>;
 @Schema()
 export class Khu_cay_trong {
 
+  @Prop()
+  ten: string;
+
   @Prop({ type: Types.ObjectId }) // Define type as ObjectId
   nguoi_dung_id: Types.ObjectId;
 

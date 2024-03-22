@@ -88,6 +88,26 @@
   	* Add this method to class ```EnvsenseService``` and call it at comment ```// Handle the message as needed```
 	* Whener using post, I suggest using ```async``` and ```await```. The reasons are quite simple: First, ```async``` makes sending message task executed concurrently without blocking the execution of other tasks; second, ```await``` pauses the execution of the sending message method until a post method is complete, if we do not use ```await```, the method return success and skip "catch (error)" since the message is successfully sent, but if the destination server do not return message, post method will raises error (since we skiped catch pharse) and our be server will be forced to stop. In the other hand, if we use ```await```, the method is paused until post method receives "success" message from destination server; since we still inside try block, if post method raises error, our server wont be stopped since we have catch block to handle this situation.
 ### API Doc
+#### About the post message that be-server sends to fe-server whenerver there is change in adafruit server:
+- Message format:
+```
+{
+	"feed_key": {feed_key: string - Ex: "nguyenthanhchung/feeds/cambien1"},
+        "feed": {feed name: string - Ex: "ma_feed_anh_sang"},
+        "curent_value": {cur_val: string},
+        "evaluate": {eval_val: string},
+        "chart_data": [
+				[date: string, value: string],
+				["2024-03-22T02:46:26Z","55.0"],
+				...
+                      ]
+
+}
+```
+- Caution: We assume that 
+  + (evaluate < 0) show that the curent value is below the low level;
+  + (evaluate > 0) show that the curent value is above the high level;
+  + (evaluate = 0) show that the curent value is in normal condition.
 #### About parameter in URL
 In the context of RESTful APIs, the two most common ways to handle dynamic data in routes are through dynamic route parameters and query parameters. These are widely supported and align well with the principles of REST. Let's explore each in more detail:
 - Dynamic Route Parameters:
@@ -129,4 +149,30 @@ Both dynamic route parameters and query parameters are fully compatible with the
   + Caution:
     * Since we have limited hardwware, so we only use feeds from the first plant area in database (find this plant area's information in folder ```yolo-farrmdb```);
     * ```ma_feed_anh_sang, ma_feed_nhiet_do, ma_feed_do_am``` are corepond to the feed change messages that are send from be to fe server.
-
+- Get detail of a plant area of specific user
+  + Url: ```/envsense/user/{user_id}/plantarea/{area_id}```
+	ex: http://127.0.0.1:3000/envsense/user/65f0529c5933e074166715a5/plantarea/65f0529c5933e074166715a8
+  + Successful response format:
+    ```
+    [
+	{
+    		"id": {area_id: string},
+    		"ten_khu_cay_trong": {area_plan: string},
+    		"nguoi_dung_id": {user_id: string},
+    		"ten_ke_hoach": {plan_name: string},
+    		"anh_sang": {
+        		"curent_value": {current_light_value: string},
+        		"evaluate": {compare_curr_value_to_the_range: number},
+        		"chart_data": [
+				["yyyy-mm-ddThh:mm:ssZ","value"],
+				...
+			]
+		},
+    		"nhiet_do": {
+        		"curent_value": "11",
+        		"evaluate": -9,
+        		"chart_data": []
+    		}
+	}
+    ]
+    ```
