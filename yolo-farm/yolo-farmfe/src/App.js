@@ -2,27 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import logo from './logo.svg';
 import './App.css';
-
-function App1() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import {DetailPage} from './pages/detailPage/DetailPage'
+import { HistoryPage } from "./pages/chartPage/HistoryPage";
 
 
 function App() {
@@ -39,7 +20,8 @@ function App() {
   }, []);
   return (
     <div>
-      <h1>{message}</h1>
+      {/* <DetailPage></DetailPage> */}
+      <HistoryPage></HistoryPage>
     </div>
   );
 }
