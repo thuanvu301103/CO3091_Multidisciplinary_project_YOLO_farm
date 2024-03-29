@@ -4,7 +4,17 @@ import logo from './logo.svg';
 import './App.css';
 import {DetailPage} from './pages/detailPage/DetailPage'
 import { HistoryPage } from "./pages/chartPage/HistoryPage";
-
+import { DashboardPage } from './pages/dashboardPage/DashboardPage';
+import { LoginPage } from './pages/loginPage/LoginPage';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams,
+  Routes
+} from "react-router-dom";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -19,10 +29,16 @@ function App() {
       });
   }, []);
   return (
-    <div>
+    <Router>
+      <Routes>
+        <Route path='/' element={<DashboardPage/>}/>
+        <Route path='/login' element={<LoginPage/>}/>
+        <Route path='/detail' element={<DetailPage/>}/>
+        <Route path='/history' element={<HistoryPage/>}/>
+      </Routes>
       {/* <DetailPage></DetailPage> */}
-      <HistoryPage></HistoryPage>
-    </div>
+      {/* <HistoryPage></HistoryPage> */}
+    </Router>
   );
 }
 

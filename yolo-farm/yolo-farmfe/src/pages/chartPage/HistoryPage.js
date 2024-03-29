@@ -4,6 +4,7 @@ import { Typography, Button } from "@material-tailwind/react";
 import { TempHistory } from "./TempHistory";
 import { LightHistory } from "./LightHistory";
 import { MoistureHistory } from "./MoistureHistory";
+import { Link } from "react-router-dom";
 export function HistoryPage() {
     return (
         <>
@@ -23,11 +24,11 @@ export function HistoryPage() {
                             &nbsp;
                             Kế hoạch: YYY
                         </Typography>
-                        <div>
+                        <Link to='/detail'>
                             <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>
                                 Trở về
                             </Button>
-                        </div>
+                        </Link>
                     </div>
                     <div className="col-span-12">
                         <TempHistory></TempHistory>

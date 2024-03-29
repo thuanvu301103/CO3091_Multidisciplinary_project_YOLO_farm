@@ -6,6 +6,7 @@ import {
   Button,
   IconButton,
 } from "@material-tailwind/react";
+import { Link } from "react-router-dom";
 import Logo from '../assets/image/Logo.png'
 export function Header() {
   const [openNav, setOpenNav] = React.useState(false);
@@ -22,9 +23,11 @@ export function Header() {
       <div className="container mx-auto flex items-center justify-between text-blue-gray-900">
         <img src={Logo} style={{height:'60px'}}></img>
         <div className="flex items-center gap-x-1">
-          <Button variant="text" size="sm" className="hidden lg:inline-block">
-            <span>Đăng nhập</span>
-          </Button>
+          <Link to = '/login'>
+            <Button variant="text" size="sm" className="hidden lg:inline-block">
+              <span>Đăng nhập</span>
+            </Button>
+          </Link>
           <Button
             variant="gradient"
             size="sm"

@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardBody,
   Typography,
-  Avatar,
 } from "@material-tailwind/react";
+import { Link } from "react-router-dom";
 import LightImg from '../../assets/image/Light.jpg';
 import TempImg from '../../assets/image/Temp.jpg';
 import MoistureImg from '../../assets/image/Moisture.jpg';
@@ -33,18 +33,22 @@ export function DetailPage(){
                             Kế hoạch: YYY
                         </Typography>
                         <div>
-                            <Button className="rounded-3xl mx-6" style={{height:'40px',backgroundColor:'#0BB489', color:'#ffffff'}}>
-                                Xem lịch sử
-                            </Button>
-                            <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>
-                                Trở về
-                            </Button>
+                            <Link to = "/history">
+                                <Button className="rounded-3xl mx-6" style={{height:'40px',backgroundColor:'#0BB489', color:'#ffffff'}}>
+                                    Xem lịch sử
+                                </Button>
+                            </Link>
+                            <Link to = "/">
+                                <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>
+                                    Trở về
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                     <div className="col-span-4">
                         <Card
                         shadow={false}
-                        className="relative grid h-[24rem] w-full max-w-[28rem] items-end justify-center overflow-hidden text-center"
+                        className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
                         >
                         <CardHeader
                             floated={false}
@@ -81,7 +85,7 @@ export function DetailPage(){
                     <div className="col-span-4">
                         <Card
                         shadow={false}
-                        className="relative grid h-[24rem] w-full max-w-[28rem] items-end justify-center overflow-hidden text-center"
+                        className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
                         >
                         <CardHeader
                             floated={false}
@@ -119,7 +123,7 @@ export function DetailPage(){
                     <div className="col-span-4">
                         <Card
                         shadow={false}
-                        className="relative grid h-[24rem] w-full max-w-[28rem] items-end justify-center overflow-hidden text-center"
+                        className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
                         >
                         <CardHeader
                             floated={false}
