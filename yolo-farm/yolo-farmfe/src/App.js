@@ -2,28 +2,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import logo from './logo.svg';
 import './App.css';
-
-function App1() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
+import {DetailPage} from './pages/detailPage/DetailPage'
+import { HistoryPage } from "./pages/chartPage/HistoryPage";
+import { DashboardPage } from './pages/dashboardPage/DashboardPage';
+import { LoginPage } from './pages/loginPage/LoginPage';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams,
+  Routes
+} from "react-router-dom";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -38,9 +29,16 @@ function App() {
       });
   }, []);
   return (
-    <div>
-      <h1>{message}</h1>
-    </div>
+    <Router>
+      <Routes>
+        <Route path='/' element={<DashboardPage/>}/>
+        <Route path='/login' element={<LoginPage/>}/>
+        <Route path='/detail' element={<DetailPage/>}/>
+        <Route path='/history' element={<HistoryPage/>}/>
+      </Routes>
+      {/* <DetailPage></DetailPage> */}
+      {/* <HistoryPage></HistoryPage> */}
+    </Router>
   );
 }
 
