@@ -1,8 +1,12 @@
 # CO3091_Multidisciplinary_project_YOLO_farm
 
-## Install necessary packages using npm
--  Integrate Adafruit IO's MQTT service: ```npm install mqtt```
+## Install necessary packages 
+### Install necessary packages for back-end server using npm
+- Integrate Adafruit IO's MQTT service: ```npm install mqtt```
 - Run web apps concurrently: ```npm install -g concurrently```
+### Install necessary packages for front-end server using npm
+- Handle routing in React applications: ```npm install react-router-dom```
+
 
 ## Run the Servers
 Open Terminal
@@ -12,6 +16,29 @@ Open Terminal
 - Import all JSON file inside folder (this step is only needed when there is no data in MongoDB server or you want to update the structure)
 
 ## Config YOLO-Farm backend server ```yolo-farmbe```
+### CORS (Cross-Origin Resource Sharing) policy 
+- CORS is a security feature implemented by browsers that restricts web applications from making requests to domains other than the one from which the application was served.
+- In our case, we're making a request from ```http://localhost:3001``` to ```http://localhost:3000```, which are different origins according to the browser. As a security measure, the server at ```http://localhost:3000``` must include the appropriate CORS headers to allow requests from ```http://localhost:3001```.
+```typescript
+// file: main.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+
+async function bootstrap() {
+	const app = await NestFactory.create(AppModule);
+
+	// Enable CORS with specific origin
+  	app.enableCors({
+    		origin: 'http://localhost:3001', // Allow requests from this origin
+    		// Other CORS options can be configured here
+  	});
+
+	await app.listen(3000);
+}
+bootstrap();
+```
+
 ### Integrate Adafruit IO's MQTT service
 - Purpose: listen for feed changes from IoT Server ```Adafruit```
 - Precondition:
@@ -34,7 +61,7 @@ Open Terminal
     ```
   + Setup mqtt connect: Since mqtt broker use concurrency model and we want our be-server to handle other task while still listening to adafruit-server, we consider defien mqtt broker in constructor:
     ```javascript
-    \\ file: envsense.service.ts
+    // file: envsense.service.ts
     import * as mqtt from 'mqtt';
     import axios from 'axios';
     import * as adafenv from '../config/config.adafruitenv'
@@ -215,3 +242,45 @@ Both dynamic route parameters and query parameters are fully compatible with the
           ]
       }
     ```
+
+## Config YOLO-Farm frontend server ```yolo-farmfe```
+### Define routs
+```javascript
+// file: src/App.js 
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import logo from './logo.svg';
+import './App.css';
+import { DetailPage } from './pages/detailPage/DetailPage'
+import { HistoryPage } from "./pages/chartPage/HistoryPage";
+import { DashboardPage } from './pages/dashboardPage/DashboardPage';
+import { LoginPage } from './pages/loginPage/LoginPage';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams,
+  Routes
+} from "react-router-dom";
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path='/user/:userid/arealist' element={<DashboardPage/>}/>
+        <Route path='/login' element={<LoginPage/>}/>
+        <Route path='/detail' element={<DetailPage/>}/>
+        <Route path='/history' element={<HistoryPage/>}/>
+      </Routes>
+      {/* <DetailPage></DetailPage> */}
+      {/* <HistoryPage></HistoryPage> */}
+    </Router>
+  );
+}
+
+export default App;
+```
+### Sitemap
+- ```localhost:3001/user/{userid}/arealist```: list of plant area of a user with specific userid

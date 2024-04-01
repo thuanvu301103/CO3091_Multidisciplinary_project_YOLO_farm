@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import { Portal } from '@mui/base/Portal';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -11,6 +12,8 @@ import {DialogDelete} from "./DialogDelete";
 import {DialogUpdate} from "./DialogUpdate";
 import {DialogView} from "./DialogView";
 import {DialogCreate} from "./DialogCreate";
+import {useParams} from "react-router-dom";
+
 function MyCustomToolbar(props) {
   return (
     <React.Fragment>
@@ -22,22 +25,28 @@ function MyCustomToolbar(props) {
   );
 }
 
-const VISIBLE_FIELDS = ['id','name', 'lighting', 'temperature', 'moisture', 'operate'];
+const VISIBLE_FIELDS = ['id','ten', 'ma_feed_anh_sang', 'ma_feed_nhiet_do', 'ma_feed_do_am', 'operate'];
 
 export function DashboardPage() {
+
+	// Get params from URL
+	const paramURL = useParams();
+	let userid = paramURL['userid'];
+	const [dataRows, setDataRows] = useState([]);
+
   const data = {
     columns: [
       { field: 'id', headerName: 'ID', align: 'left', headerAlign: 'left', flex: 0.5 },
-      { field: 'name', headerName: 'Khu cây trồng', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'lighting', headerName: 'Ánh sáng', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'temperature', headerName: 'Nhiệt độ', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'moisture', headerName: 'Độ ẩm', align: 'center', headerAlign: 'center', flex: 1 },
+      { field: 'ten', headerName: 'Khu cây trồng', align: 'center', headerAlign: 'center', flex: 1 },
+      { field: 'ma_feed_anh_sang', headerName: 'Ánh sáng', align: 'center', headerAlign: 'center', flex: 1 },
+      { field: 'ma_feed_nhiet_do', headerName: 'Nhiệt độ', align: 'center', headerAlign: 'center', flex: 1 },
+      { field: 'ma_feed_do_am', headerName: 'Độ ẩm', align: 'center', headerAlign: 'center', flex: 1 },
       { field: 'operate', headerName: 'Thao tác', align: 'center', headerAlign: 'center', flex: 1,
       renderCell: (params) => {
         console.log(params);
         return (
           <>
-            <Link to='/detail'>
+            <Link to={`/user/${userid}/area/${params.row.id}`}>
                 <DialogView values={params} />
             </Link>
             <DialogUpdate values={params}/>
@@ -48,12 +57,43 @@ export function DashboardPage() {
       }
     ]
   };
-  
-  const dataRows = [
-    { id: 1, no: 1, name: 'Cà chua', lighting: '10', temperature: '10', moisture: '10', operate: true },
-    { id: 2, no: 2, name: 'Cà rốt', lighting: '10', temperature: '10', moisture: '10', operate: false },
-  ];
-  
+
+
+	// fetch data
+	useEffect(() => {
+    		const fetchData = async () => {
+      			try {
+        			const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/list`;
+				console.log ('apiURL = ', apiUrl);
+        			// Make the HTTP GET request using Axios
+        			const response = await axios.get(apiUrl);
+				let res_data = response.data; 
+				for (let i in res_data) {
+					res_data[i]['operate'] = true;
+					res_data[i]['no'] = i+1;
+					//data[i]['id'] = data[i]['_id'];		
+				}
+				let dataRow = [];
+				for (let i in res_data) {
+					dataRow.push({
+							'id': res_data[i]['_id'], 
+							'no': i+1,
+							'ten': res_data[i]['ten'], 
+							'ma_feed_anh_sang': res_data[i]['ma_feed_anh_sang'],
+							'ma_feed_nhiet_do': res_data[i]['ma_feed_nhiet_do'],
+							'ma_feed_do_am': res_data[i]['ma_feed_do_am'],
+							'operate': true});
+				}
+				console.log ('Get datarow = ', dataRow);
+        			setDataRows(dataRow);
+      			} catch (error) {
+        			console.error('Error fetching data:', error);
+      			}
+    		};
+    		fetchData();
+  	}, [userid]);
+	
+	
   const columns = React.useMemo(
     () => data.columns.filter((column) => VISIBLE_FIELDS.includes(column.field)),
     [data.columns]

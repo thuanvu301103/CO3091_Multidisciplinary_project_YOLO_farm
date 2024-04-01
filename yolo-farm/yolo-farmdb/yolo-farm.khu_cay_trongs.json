@@ -6,8 +6,8 @@
     "ten": "Khu thanh long",
     "nguoi_dung_id": "65f0529c5933e074166715a5",
     "ke_hoach_id": "65f0529c5933e07416671510",
-    "ma_feed_anh_sang": "nguyenthanhchung/feeds/cambien1",
-    "ma_feed_nhiet_do": "nguyenthanhchung/feeds/cambien2",
-    "ma_feed_do_am": ""
+    "ma_feed_anh_sang": "nguyenthanhchung/feeds/anhsang",
+    "ma_feed_nhiet_do": "nguyenthanhchung/feeds/nhietdo",
+    "ma_feed_do_am": "nguyenthanhchung/feeds/doam"
   }
 ]

@@ -13,7 +13,48 @@ import TempImg from '../../assets/image/Temp.jpg';
 import MoistureImg from '../../assets/image/Moisture.jpg';
 
 
-export function DetailPage(){
+export await function DetailPage(){
+
+	// Get params from URL
+	const paramURL = useParams();
+	let userid = paramURL['userid'];
+	let areaid = paramURL['areaid'];
+	const [currData, setCurrData] = useState([]);
+
+	// Fetch data for the first time enter detail page
+	useEffect(() => {
+    		const fetchData = async () => {
+      			try {
+        			const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
+        			// Make the HTTP GET request using Axios
+        			const response = await axios.get(apiUrl);
+				let res_data = response.data; 
+				for (let i in res_data) {
+					res_data[i]['operate'] = true;
+					res_data[i]['no'] = i+1;
+					//data[i]['id'] = data[i]['_id'];		
+				}
+				let dataRow = [];
+				for (let i in res_data) {
+					dataRow.push({
+							'id': res_data[i]['_id'], 
+							'no': i+1,
+							'ten': res_data[i]['ten'], 
+							'ma_feed_anh_sang': res_data[i]['ma_feed_anh_sang'],
+							'ma_feed_nhiet_do': res_data[i]['ma_feed_nhiet_do'],
+							'ma_feed_do_am': res_data[i]['ma_feed_do_am'],
+							'operate': true});
+				}
+				console.log ('Get datarow = ', dataRow);
+        			setDataRows(dataRow);
+      			} catch (error) {
+        			console.error('Error fetching data:', error);
+      			}
+    		};
+    		fetchData();
+  	}, [userid]);
+
+
     return (
         <>
             <Header></Header>

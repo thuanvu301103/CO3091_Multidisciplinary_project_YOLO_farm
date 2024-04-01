@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import logo from './logo.svg';
 import './App.css';
-import {DetailPage} from './pages/detailPage/DetailPage'
+import { DetailPage } from './pages/detailPage/DetailPage'
 import { HistoryPage } from "./pages/chartPage/HistoryPage";
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
@@ -17,6 +17,7 @@ import {
 } from "react-router-dom";
 
 function App() {
+  /*
   const [message, setMessage] = useState("");
   useEffect(() => {
     axios
@@ -28,12 +29,13 @@ function App() {
         console.error(error);
       });
   }, []);
+  */
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<DashboardPage/>}/>
+        <Route path='/user/:userid/arealist' element={<DashboardPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
-        <Route path='/detail' element={<DetailPage/>}/>
+        <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
         <Route path='/history' element={<HistoryPage/>}/>
       </Routes>
       {/* <DetailPage></DetailPage> */}

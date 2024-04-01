@@ -38,10 +38,11 @@ export class EnvsenseService {
         // Subscribe to your feed(s)
         this.mqtt_client.on('connect', async () => {
 
-            let temp = await this.Khu_cay_trongModel.find({}, 'ma_feed_anh_sang ma_feed_nhiet_do').exec();
+            let temp = await this.Khu_cay_trongModel.find({}, 'ma_feed_anh_sang ma_feed_nhiet_do ma_feed1-do_am').exec();
             for (let feeds of temp) {
                 this.mqtt_client.subscribe(feeds.ma_feed_anh_sang);
                 this.mqtt_client.subscribe(feeds.ma_feed_nhiet_do);
+		this.mqtt_client.subscribe(feeds.ma_feed_do_am);
             }
             console.log('Connected to Adafruit IO MQTT');
 
@@ -67,6 +68,8 @@ export class EnvsenseService {
     // Send updated data to fe server
     private async sendFeedChangeToFe(url: string, feed_key: string, feed: string, cur_val: number, eval_val: number): Promise<void> {
         try {
+	    /*	
+		// Get chart data
             let url = `https://io.adafruit.com/api/v2/${feed_key}/data/chart?hours=5`
             let chart_data = null;
             await axios.get(url)
@@ -74,14 +77,16 @@ export class EnvsenseService {
                     //console.log('Response:', response.data);
                     chart_data = response.data.data;
                 });
+	    */
 
             let data = {
                 feed_key: feed_key,
                 feed: feed,
                 curent_value: cur_val,
                 evaluate: eval_val,
-                chart_data: chart_data
+                //chart_data: chart_data
             };
+	
             console.log(data);
             let jsonData = JSON.stringify(data);
             const response = await axios.post(url, jsonData, {
@@ -179,7 +184,7 @@ export class EnvsenseService {
     // Get list of plant areas (khu_cay_trong) of one user
     // Promise<any[]> since result model is not defined
     public async getListPlantArea(owner_id: string): Promise<any[]> {
-        return this.Khu_cay_trongModel.find({ nguoi_dung_id: owner_id }, '_id ma_feed_anh_sang ma_feed_nhiet_do ma_feed_do_am').exec();
+        return this.Khu_cay_trongModel.find({ nguoi_dung_id: owner_id }, '_id ten ma_feed_anh_sang ma_feed_nhiet_do ma_feed_do_am').exec();
     }
 
     // Get detail of plant areas (khu_cay_trong) of one user
@@ -192,12 +197,14 @@ export class EnvsenseService {
         let plan_id = feeds.ke_hoach_id;
         let ma_feed_anh_sang = feeds.ma_feed_anh_sang;
         let ma_feed_nhiet_do = feeds.ma_feed_nhiet_do;
+	let ma_feed_do_am = feeds.ma_feed_do_am;
         let plan = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
         let plan_name = plan.ten;
         // Get latest values
         let curr_anh_sang = null;
         let curr_nhiet_do = null;
-        //console.log(`https://io.adafruit.com/api/v2/${ma_feed_anh_sang}/data?limit=1`);
+	let curr_do_am = null;
+        
         await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_anh_sang}/data?limit=1`)
             .then(response => {
                 //console.log('Response:', response.data[0].value);
