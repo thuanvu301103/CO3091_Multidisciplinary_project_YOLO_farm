@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import {
   Card,
   CardBody,
@@ -5,101 +7,144 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
+import { useParams } from "react-router-dom";
+
  
 // If you're using Next.js please use the dynamic import for react-apexcharts and remove the import from the top for the react-apexcharts
 // import dynamic from "next/dynamic";
 // const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
- 
-const chartConfig = {
-  type: "line",
-  height: 240,
-  series: [
-    {
-      name: "Sales",
-      data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
-    },
-  ],
-  options: {
-    chart: {
-      toolbar: {
-        show: false,
-      },
-    },
-    title: {
-      show: "",
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    colors: ["#FCF671"],
-    stroke: {
-      lineCap: "round",
-      curve: "smooth",
-    },
-    markers: {
-      size: 0,
-    },
-    xaxis: {
-      axisTicks: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
-      labels: {
-        style: {
-          colors: "#616161",
-          fontSize: "12px",
-          fontFamily: "inherit",
-          fontWeight: 400,
+let chartConfig = {
+    type: "line",
+    height: 240,
+    series: [
+        {
+            name: "%",
+            data: [],
         },
-      },
-      categories: [
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
-    },
-    yaxis: {
-      labels: {
-        style: {
-          colors: "#616161",
-          fontSize: "12px",
-          fontFamily: "inherit",
-          fontWeight: 400,
+    ],
+    options: {
+        chart: {
+            toolbar: {
+                show: false,
+            },
         },
-      },
-    },
-    grid: {
-      show: true,
-      borderColor: "#dddddd",
-      strokeDashArray: 5,
-      xaxis: {
-        lines: {
-          show: true,
+        title: {
+            show: "",
         },
-      },
-      padding: {
-        top: 5,
-        right: 20,
-      },
+        dataLabels: {
+            enabled: false,
+        },
+        colors: ["#FCF671"],
+        stroke: {
+            lineCap: "round",
+            curve: "smooth",
+        },
+        markers: {
+            size: 0,
+        },
+        xaxis: {
+            type: "datetime",
+            axisTicks: {
+                show: false,
+            },
+            axisBorder: {
+                show: false,
+            },
+            labels: {
+                style: {
+                    colors: "#616161",
+                    fontSize: "12px",
+                    fontFamily: "inherit",
+                    fontWeight: 400,
+                },
+            },
+            categories: [],
+        },
+        yaxis: {
+            labels: {
+                style: {
+                    colors: "#616161",
+                    fontSize: "12px",
+                    fontFamily: "inherit",
+                    fontWeight: 400,
+                },
+            },
+        },
+        grid: {
+            show: true,
+            borderColor: "#dddddd",
+            strokeDashArray: 5,
+            xaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+            padding: {
+                top: 5,
+                right: 20,
+            },
+        },
+        fill: {
+            opacity: 0.8,
+        },
+        tooltip: {
+            theme: "dark",
+        },
     },
-    fill: {
-      opacity: 0.8,
-    },
-    tooltip: {
-      theme: "dark",
-    },
-  },
 };
  
 export function LightHistory() {
+
+    // Get params from URL
+    const paramURL = useParams();
+    let userid = paramURL['userid'];
+    let areaid = paramURL['areaid'];
+    const [lightData, setLightData] = useState(null);
+    const [chartData, setChartData] = useState(null);
+
+
+    // Fetch data for the first time enter detail page
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
+                // Make the HTTP GET request using Axios
+                const response = await axios.get(apiUrl);
+                let res_data = response.data;
+                setLightData(res_data['anh_sang']);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/history?filter=year`;
+                // Make the HTTP GET request using Axios
+                const response = await axios.get(apiUrl);
+                let res_data = response.data['anh_sang_chart_data'];
+                //console.log(res_data);
+                chartConfig['series'][0]['data'] = [];
+                chartConfig['options']['xaxis']['categories'] = [];
+                for (let i in res_data) {
+                    chartConfig['series'][0]['data'].push(parseInt(res_data[i][1]));
+                    chartConfig['options']['xaxis']['categories'].push(res_data[i][0]);
+                }
+                setChartData(chartConfig);
+                //console.log(chartData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    console.log(chartData);
+    
+
   return (
     <Card>
       <CardHeader
@@ -121,7 +166,8 @@ export function LightHistory() {
                     color="gray"
                     className="max-w-sm font-normal"
                 >
-                    Ánh sáng khuyến nghị: XX
+                          {lightData && lightData.low_warning && lightData.high_warning &&
+                              `Ánh sáng khuyến nghị: từ ${lightData.low_warning} đến ${lightData.high_warning}`}
                 </Typography>
             </div>
             <div className="flex items-center">
@@ -144,9 +190,11 @@ export function LightHistory() {
             </div>
         </div>
       </CardHeader>
-      <CardBody className="px-2 pb-0">
-        <Chart {...chartConfig} />
-      </CardBody>
+          <CardBody className="px-2 pb-0">
+              {chartData && (
+                  <Chart {...chartData} />
+              )}
+          </CardBody>
     </Card>
   );
 }

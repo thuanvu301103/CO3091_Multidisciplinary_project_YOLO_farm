@@ -1,11 +1,42 @@
-import {Header} from "../../components/Navbar";
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
+import { Header } from "../../components/Navbar";
 import {Sidebar} from "../../components/Sidebar";
 import { Typography, Button } from "@material-tailwind/react";
 import { TempHistory } from "./TempHistory";
 import { LightHistory } from "./LightHistory";
 import { MoistureHistory } from "./MoistureHistory";
 import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
+
 export function HistoryPage() {
+
+    // Get params from URL
+    const paramURL = useParams();
+    let userid = paramURL['userid'];
+    let areaid = paramURL['areaid'];
+    const [area_name, setAreaName] = useState(null);
+    const [plan_name, setPlanName] = useState(null);
+
+
+    // Fetch data for the first time enter detail page
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
+                // Make the HTTP GET request using Axios
+                const response = await axios.get(apiUrl);
+                let res_data = response.data;
+                setAreaName(res_data['ten_khu_cay_trong']);
+                setPlanName(res_data['ten_ke_hoach']);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
     return (
         <>
             <Header></Header>
@@ -20,9 +51,9 @@ export function HistoryPage() {
                             style={{color:'#444444'}}
                             className="mb-3 font-medium leading-[1.5] w-fit"
                             >
-                            Khu: XXX
-                            &nbsp;
-                            Kế hoạch: YYY
+                            Khu: {area_name}
+                            &nbsp; &nbsp; &nbsp; &nbsp;
+                            Kế hoạch: {plan_name}
                         </Typography>
                         <Link to='/detail'>
                             <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>

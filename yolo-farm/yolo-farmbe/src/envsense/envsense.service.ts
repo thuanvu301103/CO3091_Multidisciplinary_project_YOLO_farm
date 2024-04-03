@@ -8,7 +8,6 @@ import * as adafenv from '../config/config.adafruitenv'
 import { Nguoi_dung } from '../schemas/nguoi_dung.schema';
 import { Khu_cay_trong } from '../schemas/khu_cay_trong.schema';
 import { Ke_hoach } from '../schemas/ke_hoach.schema';
-import { Tieu_chuan } from '../schemas/tieu_chuan.schema';
 
 @Injectable()
 
@@ -16,7 +15,7 @@ export class EnvsenseService {
 
     private fe_url = "https://127.0.0.1:3001";
 
-    private mqtt_client;
+    public mqtt_client;
 
     /**
      * 
@@ -25,9 +24,7 @@ export class EnvsenseService {
     constructor(
         @InjectModel('Nguoi_dung') private readonly Nguoi_dungModel: Model<Nguoi_dung>,
         @InjectModel('Khu_cay_trong') private readonly Khu_cay_trongModel: Model<Khu_cay_trong>,
-        @InjectModel('Ke_hoach') private readonly Ke_hoachModel: Model<Ke_hoach>,
-        @InjectModel('Tieu_chuan') private readonly Tieu_chuanModel: Model<Tieu_chuan>
-    ) {
+        @InjectModel('Ke_hoach') private readonly Ke_hoachModel: Model<Ke_hoach>    ) {
 
         // Connect to Adafruit IO MQTT broker
         this.mqtt_client = mqtt.connect('mqtt://io.adafruit.com', {
@@ -42,23 +39,15 @@ export class EnvsenseService {
             for (let feeds of temp) {
                 this.mqtt_client.subscribe(feeds.ma_feed_anh_sang);
                 this.mqtt_client.subscribe(feeds.ma_feed_nhiet_do);
-		this.mqtt_client.subscribe(feeds.ma_feed_do_am);
+		    this.mqtt_client.subscribe(feeds.ma_feed_do_am);
             }
             console.log('Connected to Adafruit IO MQTT');
 
         });
 
         // Handle incoming messages
-        this.mqtt_client.on('message', async (topic, message) => {
-
-            let detail = await this.evaluateVal(topic, message);
-            console.log(detail);
-
-            console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
-            // Handle the message as needed
-            this.sendFeedChangeToFe(this.fe_url, topic, detail.feed_name, message - 0, detail.evaluate);
-        });
-
+	    /* ... */
+       
         // Handle errors
         this.mqtt_client.on('error', (err) => {
             console.error('Adafruit IO MQTT error:', err);
@@ -66,43 +55,37 @@ export class EnvsenseService {
     }
 
     // Send updated data to fe server
-    private async sendFeedChangeToFe(url: string, feed_key: string, feed: string, cur_val: number, eval_val: number): Promise<void> {
-        try {
-	    /*	
-		// Get chart data
-            let url = `https://io.adafruit.com/api/v2/${feed_key}/data/chart?hours=5`
-            let chart_data = null;
-            await axios.get(url)
-                .then(response => {
-                    //console.log('Response:', response.data);
-                    chart_data = response.data.data;
-                });
-	    */
+    public async updatePlantAreaChage(feed_name: string, feed_type: string, curr_val: number, eval_val: number) {
+        let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: feed_name }, { ma_feed_do_am: feed_name }, { ma_feed_nhiet_do: feed_name }] }).exec();
+        let user_id = area.nguoi_dung_id;
+        let plan_id = area.ke_hoach_id;
+        /*
+        let ma_feed_anh_sang = area.ma_feed_anh_sang;
+        let ma_feed_nhiet_do = area.ma_feed_nhiet_do;
+	    let ma_feed_do_am = area.ma_feed_do_am;
+        */
+        let plan = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
+        let high_warning = null;
+        let low_warning = null;
+        if (feed_type === 'ma_feed_anh_sang') {
+            high_warning = plan.gioi_han_tren_anh_sang;
+            low_warning = plan.gioi_han_duoi_anh_sang;
+        } else if (feed_type === 'ma_feed_nhiet_do') {
+            high_warning = plan.gioi_han_tren_nhiet_do;
+            low_warning = plan.gioi_han_duoi_nhiet_do;
+        } else if (feed_type === 'ma_feed_do_am') {
+            high_warning = plan.gioi_han_tren_do_am;
+            low_warning = plan.gioi_han_duoi_do_am;
+        }
 
-            let data = {
-                feed_key: feed_key,
-                feed: feed,
-                curent_value: cur_val,
-                evaluate: eval_val,
-                //chart_data: chart_data
-            };
-	
-            console.log(data);
-            let jsonData = JSON.stringify(data);
-            const response = await axios.post(url, jsonData, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            console.log('Data sent successfully:');
-        } catch (error) {
-            if (error.code === 'ECONNREFUSED') {
-                console.error('Connection refused. The server is not reachable.');
-                // Handle the error gracefully, e.g., log it or emit an event
-            } else {
-                //console.error('Error sending data:', error);
-                // Handle other types of errors as needed
-            }
+        return {
+            id: area._id,
+            nguoi_dung_id: user_id,
+            feed_type: feed_type,
+            curent_value: curr_val,
+            evaluate: eval_val,
+            high_warning: high_warning,
+            low_warning: low_warning
         }
     }
 
@@ -131,53 +114,40 @@ export class EnvsenseService {
     }
 
     // Evaluate curent value
-    private async evaluateVal(topic, message): Promise<{ feed_name: string; evaluate: number; }> {
-        let feeds = await this.Khu_cay_trongModel.find({ $or: [{ ma_feed_anh_sang: topic }, { ma_feed_nhiet_do: topic }] }, 'ke_hoach_id ma_feed_anh_sang ma_feed_nhiet_do').exec();
+    public async evaluateVal(topic, message): Promise<{ feed_name: string; evaluate: number; }> {
+        let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: topic }, { ma_feed_nhiet_do: topic }, { ma_feed_do_am: topic }] }).exec();
         let feed_name = null;
         let plan_id = null;
+
         // Identify feed_name of change
-        for (let feed of feeds) {
-            if (feed.ma_feed_anh_sang == topic) {
-                feed_name = "ma_feed_anh_sang";
-            } else if (feed.ma_feed_nhiet_do == topic) {
-                feed_name = "ma_feed_nhiet_do";
-            }
-            plan_id = feed.ke_hoach_id;
+        if (area.ma_feed_anh_sang === topic) {
+            feed_name = "ma_feed_anh_sang";
+        } else if (area.ma_feed_nhiet_do === topic) {
+            feed_name = "ma_feed_nhiet_do";
+        } else if (area.ma_feed_do_am === topic) {
+            feed_name = "ma_feed_do_am";
         }
+        plan_id = area.ke_hoach_id;
+
         // Identify limits of change
-        let standards = await this.Tieu_chuanModel.find({ ke_hoach_id: plan_id }).exec();
-        let currentDate = new Date();
-        let evaluate = 0;
-        for (let standard of standards) {
-
-            let start_day = this.parseDayMonthString(standard.ngay_bat_dau.toString());
-            let end_day = this.parseDayMonthString(standard.ngay_ket_thuc.toString());
-            /*
-            // Test
-            console.log(standard.ngay_bat_dau.toString());
-            console.log(standard.ngay_ket_thuc.toString());
-            //console.log(this.isWithinRange(start_day, end_day, currentDate));
-            console.log("Curent day:" + currentDate.toString());
-            console.log("Start day:" + start_day.toString());
-            console.log("End day:" + end_day.toString());
-            */
-            if (this.isWithinRange(start_day, end_day, currentDate)) {
-                // Get high and low level
-                let high_level = null;
-                let low_level = null;
-                if (feed_name == "ma_feed_anh_sang") {
-                    high_level = standard.gioi_han_tren_anh_sang;
-                    low_level = standard.gioi_han_duoi_anh_sang;
-
-                } else if (feed_name == "ma_feed_nhiet_do") {
-                    high_level = standard.gioi_han_tren_nhiet_do;
-                    low_level = standard.gioi_han_duoi_nhiet_do;
-                }
-                // Calculate evaluation value which the condition of values
-                if (message < low_level) evaluate = message - low_level;
-                else if (message > high_level) evaluate = message - high_level;
-            }
+        let standard = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
+        let high_level = null;
+        let low_level = null;
+        if (feed_name == "ma_feed_anh_sang") {
+            high_level = standard.gioi_han_tren_anh_sang;
+            low_level = standard.gioi_han_duoi_anh_sang;
+        } else if (feed_name == "ma_feed_nhiet_do") {
+            high_level = standard.gioi_han_tren_nhiet_do;
+            low_level = standard.gioi_han_duoi_nhiet_do;
+        } else if (feed_name == "ma_feed_do_am") {
+            high_level = standard.gioi_han_tren_do_am;
+            low_level = standard.gioi_han_duoi_do_am;
         }
+
+        let evaluate = 0;
+        // Calculate evaluation value which the condition of values
+        if (message < low_level) evaluate = message - low_level;
+        else if (message > high_level) evaluate = message - high_level;
         return { "feed_name": feed_name, "evaluate": evaluate };
     }
 
@@ -190,20 +160,19 @@ export class EnvsenseService {
     // Get detail of plant areas (khu_cay_trong) of one user
     // Promise<any[]> since result model is not defined
     public async getDetailPlantArea(userid: string, areaid: string) {
-        let feeds = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec();
-        let id = feeds._id;
-        let area_name = feeds.ten;
-        let user_id = feeds.nguoi_dung_id;
-        let plan_id = feeds.ke_hoach_id;
-        let ma_feed_anh_sang = feeds.ma_feed_anh_sang;
-        let ma_feed_nhiet_do = feeds.ma_feed_nhiet_do;
-	let ma_feed_do_am = feeds.ma_feed_do_am;
+        let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec(); 
+        let user_id = area.nguoi_dung_id;
+        let plan_id = area.ke_hoach_id;
+        let ma_feed_anh_sang = area.ma_feed_anh_sang;
+        let ma_feed_nhiet_do = area.ma_feed_nhiet_do;
+	    let ma_feed_do_am = area.ma_feed_do_am;
         let plan = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
         let plan_name = plan.ten;
+
         // Get latest values
         let curr_anh_sang = null;
         let curr_nhiet_do = null;
-	let curr_do_am = null;
+	    let curr_do_am = null;
         
         await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_anh_sang}/data?limit=1`)
             .then(response => {
@@ -211,12 +180,6 @@ export class EnvsenseService {
                 curr_anh_sang = response.data[0].value;
             });
         let eval_anh_sang = (await this.evaluateVal(ma_feed_anh_sang, curr_anh_sang)).evaluate;
-        let chart_data_anh_sang = null;
-        await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_anh_sang}/data/chart?hours=2`)
-            .then(response => {
-                //console.log('Response:', response.data);
-                chart_data_anh_sang = response.data.data;
-            });
 
         await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_nhiet_do}/data?limit=1`)
             .then(response => {
@@ -224,37 +187,47 @@ export class EnvsenseService {
                 curr_nhiet_do = response.data[0].value;
             });
         let eval_nhiet_do = (await this.evaluateVal(ma_feed_nhiet_do, curr_nhiet_do)).evaluate;
-        let chart_data_nhiet_do = null;
-        await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_nhiet_do}/data/chart?hours=5`)
+
+        await axios.get(`https://io.adafruit.com/api/v2/${ma_feed_do_am}/data?limit=1`)
             .then(response => {
-                //console.log('Response:', response.data);
-                chart_data_nhiet_do = response.data.data;
+                //console.log('Response:', response.data[0].value);
+                curr_do_am = response.data[0].value;
             });
+        let eval_do_am = (await this.evaluateVal(ma_feed_do_am, curr_do_am)).evaluate;
 
         return {
-            id: id,
-            ten_khu_cay_trong: area_name,
+            id: area._id,
+            ten_khu_cay_trong: area.ten,
             nguoi_dung_id: user_id,
             ten_ke_hoach: plan_name,
             anh_sang: {
                 curent_value: curr_anh_sang,
                 evaluate: eval_anh_sang,
-                chart_data: chart_data_anh_sang
+                high_warning: plan.gioi_han_tren_anh_sang,
+                low_warning: plan.gioi_han_duoi_anh_sang
             },
             nhiet_do: {
                 curent_value: curr_nhiet_do,
                 evaluate: eval_nhiet_do,
-                chart_data: chart_data_nhiet_do
+                high_warning: plan.gioi_han_tren_nhiet_do,
+                low_warning: plan.gioi_han_duoi_nhiet_do
+            },
+            do_am: {
+                curent_value: curr_do_am,
+                evaluate: eval_do_am,
+                high_warning: plan.gioi_han_tren_do_am,
+                low_warning: plan.gioi_han_duoi_do_am
             }
-
         }
     }
+	 
 
     // Get history chart data
     public async getHistoryData(start_time: string, end_time: string, userid: string, areaid: string) {
         let feeds = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid}]}, 'ma_feed_anh_sang ma_feed_nhiet_do ma_feed_do_am').exec()
         let anh_sang_data = null;
         let nhiet_do_data = null;
+        let do_am_data = null;
         await axios.get(`https://io.adafruit.com/api/v2/${feeds.ma_feed_anh_sang}/data/chart?start_time=${start_time}&end_time=${end_time}`)
             .then(response => {
                 anh_sang_data = response.data.data;
@@ -263,9 +236,14 @@ export class EnvsenseService {
             .then(response => {
                 nhiet_do_data = response.data.data;
             });
+        await axios.get(`https://io.adafruit.com/api/v2/${feeds.ma_feed_do_am}/data/chart?start_time=${start_time}&end_time=${end_time}`)
+            .then(response => {
+                do_am_data = response.data.data;
+            });
         return {
             anh_sang_chart_data: anh_sang_data,
-            nhiet_do_chart_data: nhiet_do_data
+            nhiet_do_chart_data: nhiet_do_data,
+            do_am_chart_data: do_am_data
         }
     }
 

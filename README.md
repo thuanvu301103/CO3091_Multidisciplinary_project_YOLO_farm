@@ -122,21 +122,52 @@ bootstrap();
   Caution:
   	* Add this method to class ```EnvsenseService``` and call it at comment ```// Handle the message as needed```
 	* Whener using post, I suggest using ```async``` and ```await```. The reasons are quite simple: First, ```async``` makes sending message task executed concurrently without blocking the execution of other tasks; second, ```await``` pauses the execution of the sending message method until a post method is complete, if we do not use ```await```, the method return success and skip "catch (error)" since the message is successfully sent, but if the destination server do not return message, post method will raises error (since we skiped catch pharse) and our be server will be forced to stop. In the other hand, if we use ```await```, the method is paused until post method receives "success" message from destination server; since we still inside try block, if post method raises error, our server wont be stopped since we have catch block to handle this situation.
+
+### Realtime data streaming using server-sent events(SSE) - Sending messages from be-server
+- The purpuse of SSE iss to maintain a connection between be-server and fe-server (client)
+- To implement this, we have to reserve a route to maintain the connecion (let's say ```http://127.0.0.1:3000/envsense``` for our project), when ever a client call this route, it will establish a connection and listen to messages from be-server
+- The headers and content of HTTP messages must be in specific format. The content musst be in format ```"data:" + JSON data string + "\n\n"``` 
+```typescript
+// file: envense.controller.ts
+	@Get()
+	async streamEvent(@Res() res) {
+		// Set up HTTP header for stream Event
+		res.setHeader('Content-Type', 'text/event-stream');
+    	res.setHeader('Cache-Control', 'no-cache');
+    	res.flushHeaders();
+
+		// Sent first message when connection iss esstablished
+		//res.write();
+	
+		// Sent message when changes occurred	
+		this.envsenseService.mqtt_client.on('message', async (topic, message) => {
+
+            let detail = await this.envsenseService.evaluateVal(topic, message);
+            console.log(detail);
+
+            console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
+            // Handle the message as needed
+            let res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
+			console.log('Sent data: ', res_data);
+            res.write("data:" + res_data + "\n\n");
+        });
+	}
+```
+
 ### API Doc
-#### About the post message that be-server sends to fe-server whenerver there is change in adafruit server:
+#### About the SSE message that be-server sends to fe-server whenerver there is change in adafruit server:
 - Message format:
 ```
 {
-	"feed_key": {feed_key: string - Ex: "nguyenthanhchung/feeds/cambien1"},
-        "feed": {feed name: string - Ex: "ma_feed_anh_sang"},
-        "curent_value": {cur_val: string},
-        "evaluate": {eval_val: string},
-        "chart_data": [
-				[date: string, value: string],
-				["2024-03-22T02:46:26Z","55.0"],
-				...
-                      ]
-
+	data:{
+		"id":"65f0529c5933e074166715a8",
+		"nguoi_dung_id":"65f0529c5933e074166715a5",
+		"feed_type":"ma_feed_anh_sang",
+		"curent_value":15,
+		"evaluate":0,
+		"high_warning":50,
+		"low_warning":15
+	}
 }
 ```
 - Caution: We assume that 
@@ -201,23 +232,28 @@ Both dynamic route parameters and query parameters are fully compatible with the
     ```
     [
 	{
-    		"id": {area_id: string},
-    		"ten_khu_cay_trong": {area_plan: string},
-    		"nguoi_dung_id": {user_id: string},
-    		"ten_ke_hoach": {plan_name: string},
-    		"anh_sang": {
-        		"curent_value": {current_light_value: string},
-        		"evaluate": {compare_curr_value_to_the_range: number},
-        		"chart_data": [
-				["yyyy-mm-ddThh:mm:ssZ","value"],
-				...
-			]
-		},
-    		"nhiet_do": {
-        		"curent_value": "11",
-        		"evaluate": -9,
-        		"chart_data": []
-    		}
+	    id: area._id,
+            ten_khu_cay_trong: area.ten,
+            nguoi_dung_id: user_id,
+            ten_ke_hoach: plan_name,
+            anh_sang: {
+                curent_value: curr_anh_sang,
+                evaluate: eval_anh_sang,
+                high_warning: plan.gioi_han_tren_anh_sang,
+                low_warning: plan.gioi_han_duoi_anh_sang
+            },
+            nhiet_do: {
+                curent_value: curr_nhiet_do,
+                evaluate: eval_nhiet_do,
+                high_warning: plan.gioi_han_tren_nhiet_do,
+                low_warning: plan.gioi_han_duoi_nhiet_do
+            },
+            do_am: {
+                curent_value: curr_do_am,
+                evaluate: eval_do_am,
+                high_warning: plan.gioi_han_tren_do_am,
+                low_warning: plan.gioi_han_duoi_do_am
+            }
 	}
     ]
     ```
@@ -236,6 +272,11 @@ Both dynamic route parameters and query parameters are fully compatible with the
 	      ...
           ],
          "nhiet_do_chart_data": [
+              ["2024-03-16T14:23:48Z","15.0"],
+              ["2024-03-16T14:23:52Z","30.0"],
+	      ...
+          ],
+          "do_am_chart_data": [
               ["2024-03-16T14:23:48Z","15.0"],
               ["2024-03-16T14:23:52Z","30.0"],
 	      ...
@@ -282,5 +323,93 @@ function App() {
 
 export default App;
 ```
+
+### Realtime data streaming using server-sent events(SSE) - Receiving messages from fe-server 
+```javascript
+// file: DetailPage.js
+    // Handle SSE messages from be-server
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const eventSource = new EventSource('http://127.0.0.1:3000/envsense'); // Create a connection to be-server then maintain it in time
+
+                eventSource.onopen = () => {
+                    console.log('SSE connection established.');
+                };
+
+                // Change value when changes occurred
+                eventSource.onmessage = (event) => {
+                    const eventData = JSON.parse(event.data);
+                    console.log('Received event:', eventData);
+                    if (eventData['feed_type'] === 'ma_feed_anh_sang') {
+                        setLightData(eventData);
+                    } else if (eventData['feed_type'] === 'ma_feed_nhiet_do') {
+                        setTempData(eventData);
+                    } else if (eventData['feed_type'] === 'ma_feed_do_am') {
+                        setMidData(eventData);
+                    }
+                    // Handle the received event data
+                };
+
+                eventSource.onerror = (error) => {
+                    console.error('SSE connection error:', error);
+                    // Handle SSE connection error
+                };
+
+                return () => {
+                    eventSource.close();    // Close connection
+                };
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+```
+
+
+### Using ```useEffecct()``` to perform side effects in your components.
+- The useEffect Hook allows you to perform side effects in your components.
+- Some examples of side effects are: fetching data, directly updating the DOM, and timers.
+- useEffect accepts two arguments. The second argument is optional: ```useEffect(<function>, <dependency>)```
+- Caution: since the page sent to browser (html) is rendered continuosly, so when ```return```, you need to make sure that the changing element is other than ```null```
+```typescript
+// file: Detailpage.js
+	// Get params from URL
+	const paramURL = useParams();
+	let userid = paramURL['userid'];
+	let areaid = paramURL['areaid'];
+    	
+    	const [area_name, setAreaName] = useState(null);
+
+	// Fetch data for the first time enter detail page
+    	useEffect(() => {
+        	const fetchData = async () => {
+            		try {
+                		const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
+                		// Make the HTTP GET request using Axios
+                		const response = await axios.get(apiUrl);
+                		let res_data = response.data;
+                		setAreaName(res_data['ten_khu_cay_trong']);
+            		} catch (error) {
+                		console.error('Error fetching data:', error);
+            		}
+        	};
+        	fetchData();
+    	}, []);
+
+    	console.log ('Area\'s name: ', area_name);
+	
+	// Return rendered page
+	return (
+        	<>          
+                  	{tempData && tempData.curent_value &&`${tempData.curent_value}`}
+                </>
+    		);
+```
+
 ### Sitemap
 - ```localhost:3001/user/{userid}/arealist```: list of plant area of a user with specific userid
+- ```localhost:3001/user/{userid}/area/{areaid}```: detail of plant area of a user with specific userid and areaid
+- ```localhost:3001/user/{userid}/area/{areaid}/history```: history of plant area of a user with specific userid and areaid

@@ -1,8 +1,12 @@
-[
-  {
-    "_id": {
-      "$oid": "65f0529c5933e07416671510"
-    },
-    "ten": "Thanh long ruột đỏ"
-  }
-]
+[{
+  "_id": {
+    "$oid": "65f0529c5933e07416671510"
+  },
+  "ten": "Thanh long ruột đỏ",
+  "gioi_han_tren_anh_sang": 50,
+  "gioi_han_duoi_anh_sang": 15,
+  "gioi_han_tren_nhiet_do": 50,
+  "gioi_han_duoi_nhiet_do": 15,
+  "gioi_han_tren_do_am": 50,
+  "gioi_han_duoi_do_am": 15
+}]

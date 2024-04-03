@@ -36,7 +36,7 @@ function App() {
         <Route path='/user/:userid/arealist' element={<DashboardPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
-        <Route path='/history' element={<HistoryPage/>}/>
+        <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
       </Routes>
       {/* <DetailPage></DetailPage> */}
       {/* <HistoryPage></HistoryPage> */}

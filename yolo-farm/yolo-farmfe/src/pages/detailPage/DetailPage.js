@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import {Header} from "../../components/Navbar";
 import {Sidebar} from "../../components/Sidebar";
 import { Button, CardFooter } from "@material-tailwind/react";
@@ -8,52 +10,92 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
+import { SSEComponent } from "../../components/SSEComponent";
 import LightImg from '../../assets/image/Light.jpg';
 import TempImg from '../../assets/image/Temp.jpg';
 import MoistureImg from '../../assets/image/Moisture.jpg';
+import {useParams} from "react-router-dom";
 
 
-export await function DetailPage(){
+export function DetailPage(){
 
 	// Get params from URL
 	const paramURL = useParams();
 	let userid = paramURL['userid'];
 	let areaid = paramURL['areaid'];
-	const [currData, setCurrData] = useState([]);
+    const [tempData, setTempData] = useState(null);
+    const [lightData, setLightData] = useState(null);
+    const [midData, setMidData] = useState(null);
+    const [area_name, setAreaName] = useState(null);
+    const [plan_name, setPlanName] = useState(null);
 
+ 
 	// Fetch data for the first time enter detail page
-	useEffect(() => {
-    		const fetchData = async () => {
-      			try {
-        			const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
-        			// Make the HTTP GET request using Axios
-        			const response = await axios.get(apiUrl);
-				let res_data = response.data; 
-				for (let i in res_data) {
-					res_data[i]['operate'] = true;
-					res_data[i]['no'] = i+1;
-					//data[i]['id'] = data[i]['_id'];		
-				}
-				let dataRow = [];
-				for (let i in res_data) {
-					dataRow.push({
-							'id': res_data[i]['_id'], 
-							'no': i+1,
-							'ten': res_data[i]['ten'], 
-							'ma_feed_anh_sang': res_data[i]['ma_feed_anh_sang'],
-							'ma_feed_nhiet_do': res_data[i]['ma_feed_nhiet_do'],
-							'ma_feed_do_am': res_data[i]['ma_feed_do_am'],
-							'operate': true});
-				}
-				console.log ('Get datarow = ', dataRow);
-        			setDataRows(dataRow);
-      			} catch (error) {
-        			console.error('Error fetching data:', error);
-      			}
-    		};
-    		fetchData();
-  	}, [userid]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
+                // Make the HTTP GET request using Axios
+                const response = await axios.get(apiUrl);
+                let res_data = response.data;
+                setAreaName(res_data['ten_khu_cay_trong']);
+                setPlanName(res_data['ten_ke_hoach']);
+                setTempData(res_data['nhiet_do']);
+                setLightData(res_data['anh_sang']);
+                setMidData(res_data['do_am']);
 
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // Handle SSE messages from be-server
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const eventSource = new EventSource('http://127.0.0.1:3000/envsense'); // Create a connection to be-server then maintain it in time
+
+                eventSource.onopen = () => {
+                    console.log('SSE connection established.');
+                };
+
+                // Change value when changes occurred
+                eventSource.onmessage = (event) => {
+                    const eventData = JSON.parse(event.data);
+                    console.log('Received event:', eventData);
+                    if (eventData['feed_type'] === 'ma_feed_anh_sang') {
+                        setLightData(eventData);
+                    } else if (eventData['feed_type'] === 'ma_feed_nhiet_do') {
+                        setTempData(eventData);
+                    } else if (eventData['feed_type'] === 'ma_feed_do_am') {
+                        setMidData(eventData);
+                    }
+                    // Handle the received event data
+                };
+
+                eventSource.onerror = (error) => {
+                    console.error('SSE connection error:', error);
+                    // Handle SSE connection error
+                };
+
+                return () => {
+                    eventSource.close();    // Close connection
+                };
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+
+    /*
+    console.log ('Area\'s name: ', area_name);
+    console.log ('Plan\'s name: ', plan_name);
+    */
 
     return (
         <>
@@ -69,9 +111,9 @@ export await function DetailPage(){
                             style={{color:'#444444'}}
                             className="mb-3 font-medium leading-[1.5] w-fit"
                             >
-                            Khu: XXX
-                            &nbsp;
-                            Kế hoạch: YYY
+                            Khu: {area_name}
+                            &nbsp; &nbsp; &nbsp; &nbsp;
+                            Kế hoạch: {plan_name}
                         </Typography>
                         <div>
                             <Link to = "/history">
@@ -105,8 +147,10 @@ export await function DetailPage(){
                             style={{fontSize:'100px', color: '#FCF671', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
-                            30
+                                    {tempData && tempData.curent_value &&
+                                        `${tempData.curent_value}`}
                             </Typography>
+
                             <Typography
                             variant="h3"
                             color="white"
@@ -115,11 +159,15 @@ export await function DetailPage(){
                             Nhiệt độ
                             </Typography>
                             <Typography variant="h6" className="mb-4 text-gray-400 w-full">
-                            Nhiệt độ khuyến nghị: 30
+                                    {tempData && tempData.low_warning && tempData.high_warning &&
+                                        `Nhiệt độ khuyến nghị: từ ${tempData.low_warning} đến ${tempData.high_warning}`}
                             </Typography>
-                            <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                Tình trạng: Tốt
-                            </Button>
+                                <Button className="rounded-3xl" style={{ backgroundColor: 'white', color: '#4CA844', backgroundColor: 'rgb(255,255,255)' }}>
+                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? `Cao hơn giới hạn trên ${tempData.evaluate}`:null}
+                                    {tempData && (tempData.evaluate ==  0) ? `Tình trạng tốt`: null}
+                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${0-tempData.evaluate}`:null}
+                                    
+                                </Button>
                         </CardBody>
                         </Card>
                     </div>
@@ -143,7 +191,8 @@ export await function DetailPage(){
                             style={{fontSize:'100px', color: '#C0D82B', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
-                            30
+                                    {lightData && lightData.curent_value &&
+                                        `${lightData.curent_value}`}
                             </Typography>
                             <Typography
                             variant="h3"
@@ -153,10 +202,13 @@ export await function DetailPage(){
                             Ánh sáng
                             </Typography>
                             <Typography variant="h6" className="mb-4 text-gray-400">
-                            Ánh sáng khuyến nghị: XX
+                                    {lightData && lightData.low_warning && lightData.high_warning &&
+                                        `Ánh sáng khuyến nghị: từ ${lightData.low_warning} đến ${lightData.high_warning}`}
                             </Typography>
                             <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                Tình trạng: Tốt
+                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? `Cao hơn giới hạn trên ${lightData.evaluate}`: null}
+                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${0 - lightData.evaluate}`:null}
+                                    {lightData && lightData.evaluate == 0 ? `Tình trạng tốt` : null}
                             </Button>
                         </CardBody>
                         </Card>
@@ -180,7 +232,8 @@ export await function DetailPage(){
                             style={{fontSize:'100px', color: '#1152FA', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
-                            30
+                                    {midData && midData.curent_value &&
+                                        `${midData.curent_value}`}
                             </Typography>
                             <Typography
                             variant="h3"
@@ -190,10 +243,13 @@ export await function DetailPage(){
                             Độ ẩm
                             </Typography>
                             <Typography variant="h6" className="mb-4 text-gray-400">
-                            Độ ẩm khuyến nghị: XX
+                                    {midData && midData.low_warning && midData.high_warning &&
+                                        `Độ ẩm khuyến nghị: từ ${midData.low_warning} đến ${midData.high_warning}`}
                             </Typography>
                             <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                Tình trạng: Tốt
+                                    {midData && midData.evaluate && midData.evaluate > 0 ? `Cao hơn giới hạn trên ${midData.evaluate}`:null}
+                                    {midData && midData.evaluate && midData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${0 - midData.evaluate}`:null}
+                                    {midData && midData.evaluate == 0 ? `Tình trạng tốt`:null}
                             </Button>
                         </CardBody>
                         </Card>

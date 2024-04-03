@@ -12,6 +12,7 @@ import {DialogDelete} from "./DialogDelete";
 import {DialogUpdate} from "./DialogUpdate";
 import {DialogView} from "./DialogView";
 import {DialogCreate} from "./DialogCreate";
+import {SSEComponent} from '../../components/SSEComponent';
 import {useParams} from "react-router-dom";
 
 function MyCustomToolbar(props) {
@@ -34,14 +35,15 @@ export function DashboardPage() {
 	let userid = paramURL['userid'];
 	const [dataRows, setDataRows] = useState([]);
 
-  const data = {
-    columns: [
-      { field: 'id', headerName: 'ID', align: 'left', headerAlign: 'left', flex: 0.5 },
-      { field: 'ten', headerName: 'Khu cây trồng', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'ma_feed_anh_sang', headerName: 'Ánh sáng', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'ma_feed_nhiet_do', headerName: 'Nhiệt độ', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'ma_feed_do_am', headerName: 'Độ ẩm', align: 'center', headerAlign: 'center', flex: 1 },
-      { field: 'operate', headerName: 'Thao tác', align: 'center', headerAlign: 'center', flex: 1,
+    const data = {
+        columns: [
+    
+        { field: 'id', headerName: 'ID', align: 'left', headerAlign: 'left', flex: 0.5 },
+        { field: 'ten', headerName: 'Khu cây trồng', align: 'center', headerAlign: 'center', flex: 1 },
+        { field: 'ma_feed_anh_sang', headerName: 'Ánh sáng', align: 'center', headerAlign: 'center', flex: 1 },
+        { field: 'ma_feed_nhiet_do', headerName: 'Nhiệt độ', align: 'center', headerAlign: 'center', flex: 1 },
+        { field: 'ma_feed_do_am', headerName: 'Độ ẩm', align: 'center', headerAlign: 'center', flex: 1 },
+        { field: 'operate', headerName: 'Thao tác', align: 'center', headerAlign: 'center', flex: 1,
       renderCell: (params) => {
         console.log(params);
         return (
