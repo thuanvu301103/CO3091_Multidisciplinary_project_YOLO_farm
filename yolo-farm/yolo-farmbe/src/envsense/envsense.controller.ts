@@ -8,8 +8,8 @@ export class EnvsenseController {
 
 	@Get()
 	async streamEvent(@Res() res) {
-		// Set up HTTP header for stream Event
-		res.setHeader('Content-Type', 'text/event-stream');
+	// Set up HTTP header for stream Event
+	res.setHeader('Content-Type', 'text/event-stream');
     	res.setHeader('Cache-Control', 'no-cache');
     	res.flushHeaders();
 	
