@@ -57,8 +57,6 @@ export class EnvsenseController {
         let day = curr_date.getDate();
         let formatted_start_time = null;
         let formatted_end_time = null;
-        //const month = ('0' + (curr_date.getMonth() + 1)).slice(-2); // Adding 1 to month because it's zero-based
-        //const day = ('0' + curr_date.getDate()).slice(-2);
 
         // Construct the formatted string
         //const formatted_date = `${year}-${month}-${day}T${hours}:${minutes}`;
