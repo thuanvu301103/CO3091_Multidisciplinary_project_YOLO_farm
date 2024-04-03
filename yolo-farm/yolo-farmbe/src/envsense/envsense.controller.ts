@@ -12,9 +12,6 @@ export class EnvsenseController {
 		res.setHeader('Content-Type', 'text/event-stream');
     	res.setHeader('Cache-Control', 'no-cache');
     	res.flushHeaders();
-
-		// Sent first message when connection iss esstablished
-		//res.write();
 	
 		// Sent message when changes occurred	
 		this.envsenseService.mqtt_client.on('message', async (topic, message) => {
