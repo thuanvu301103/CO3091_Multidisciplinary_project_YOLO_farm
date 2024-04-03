@@ -8,6 +8,10 @@
     "ke_hoach_id": "65f0529c5933e07416671510",
     "ma_feed_anh_sang": "nguyenthanhchung/feeds/anhsang",
     "ma_feed_nhiet_do": "nguyenthanhchung/feeds/nhietdo",
-    "ma_feed_do_am": "nguyenthanhchung/feeds/doam"
+    "ma_feed_do_am": "nguyenthanhchung/feeds/doam",
+    "ma_feed_nutnhan_den": "nguyenthanhchung/feeds/nutnhan_den",
+    "ma_feed_nutnhan_maybom": "nguyenthanhchung/feeds/nutnhan_maybom",
+    "che_do_anh_sang": "tu dong",
+    "che_do_nhiet_am": "tu dong"
   }
 ]

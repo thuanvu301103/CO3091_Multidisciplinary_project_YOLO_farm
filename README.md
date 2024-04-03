@@ -214,11 +214,11 @@ Both dynamic route parameters and query parameters are fully compatible with the
     ```
     [
  		{
-        	"_id": {plant_area_id: string},
-        	"ma_feed_anh_sang": {mqtt_feed_key_1: string},
-        	"ma_feed_nhiet_do": {mqtt_feed_key_2: string},
-        	"ma_feed_do_am": {mqtt_feed_key_2: string}
-    	},
+        		"_id": {plant_area_id: string},
+        		"ma_feed_anh_sang": {mqtt_feed_key_1: string},
+        		"ma_feed_nhiet_do": {mqtt_feed_key_2: string},
+        		"ma_feed_do_am": {mqtt_feed_key_2: string}
+    		},
     		...
     ]
     ```
@@ -283,6 +283,21 @@ Both dynamic route parameters and query parameters are fully compatible with the
           ]
       }
     ```
+
+#### API for usecase 2: Supervise the plant area
+- Send signal to turn off or on light relay
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/turnon/{turnon}```. With ```turnon === 1``` means turn on the light relay; ```turnon === 0``` means turn off the light.
+  + Response: 
+	> Successed: {200: "OK"}
+	> Failed: {403: "Forbidden: manual mode is off"}
+
+- Change light mode
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/mode/{mode}```. With ```mode``` equals ```tu dong``` or ```thu cong``` or ```theo lich```.
+  + Response: 
+	> Successed: {200: "OK"}
+	> Failed: 
+		{500: "Internal Server Error"}
+		{400: "Bad Request"}
 
 ## Config YOLO-Farm frontend server ```yolo-farmfe```
 ### Define routs

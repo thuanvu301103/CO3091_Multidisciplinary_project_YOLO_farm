@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Res } from '@nestjs/common';
 import { EnvsenseService } from './envsense.service';
 
 @Controller('envsense')
@@ -24,7 +24,9 @@ export class EnvsenseController {
 
             console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
             // Handle the message as needed
-            let res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
+            let res_data = null;
+            if (detail.feed_name == 'ma_feed_nutnhan_den') res_data = JSON.stringify(await this.envsenseService.updateLightButtonChange(topic, detail.feed_name, message - 0));
+            else res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
 			console.log('Sent data: ', res_data);
             res.write("data:" + res_data + "\n\n");
         });
@@ -82,5 +84,33 @@ export class EnvsenseController {
             formatted_end_time = `${year+1}-12-31T23:59Z`;
         }
         return this.envsenseService.getHistoryData(formatted_start_time, formatted_end_time, userid, areaid);
+    }
+
+    /*
+     * Ex: http://127.0.0.1:3000/envsense/user/65f0529c5933e074166715a5/plantarea/65f0529c5933e074166715a8/light/turnon/1
+     */
+    @Get('user/:userid/plantarea/:areaid/light/turnon/:turnon')
+    async turnOnLight(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string,
+        @Param('turnon') turnon: number,
+        @Res() res
+    ) {
+        let result = await this.envsenseService.turnOnLight(userid, areaid, turnon);
+        if (result) res.status(200).send('OK');
+        else res.status(403).send('Forbidden: manual mode is off');
+    }
+
+    @Get('user/:userid/plantarea/:areaid/light/mode/:mode')
+    async changeLightMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string,
+        @Param('mode') mode: string,
+        @Res() res
+    ) {
+        let result: Promise<string>  = this.envsenseService.changeLightMode(userid, areaid, mode);
+        if (await result == "400") res.status(400).send("Bad Request");
+        else if (await result == "200") res.status(200).send("OK");
+        else if (await result == "500") res.status(500).send("Internal Server Error");
     }
 }

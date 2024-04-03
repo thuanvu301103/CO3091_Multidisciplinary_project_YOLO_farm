@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+﻿import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import * as mqtt from 'mqtt';
 import axios from 'axios';
@@ -35,11 +35,13 @@ export class EnvsenseService {
         // Subscribe to your feed(s)
         this.mqtt_client.on('connect', async () => {
 
-            let temp = await this.Khu_cay_trongModel.find({}, 'ma_feed_anh_sang ma_feed_nhiet_do ma_feed1-do_am').exec();
+            let temp = await this.Khu_cay_trongModel.find({}).exec();
             for (let feeds of temp) {
                 this.mqtt_client.subscribe(feeds.ma_feed_anh_sang);
                 this.mqtt_client.subscribe(feeds.ma_feed_nhiet_do);
-		    this.mqtt_client.subscribe(feeds.ma_feed_do_am);
+                this.mqtt_client.subscribe(feeds.ma_feed_do_am);
+                this.mqtt_client.subscribe(feeds.ma_feed_nutnhan_den);
+                this.mqtt_client.subscribe(feeds.ma_feed_nutnhan_maybom);
             }
             console.log('Connected to Adafruit IO MQTT');
 
@@ -115,7 +117,7 @@ export class EnvsenseService {
 
     // Evaluate curent value
     public async evaluateVal(topic, message): Promise<{ feed_name: string; evaluate: number; }> {
-        let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: topic }, { ma_feed_nhiet_do: topic }, { ma_feed_do_am: topic }] }).exec();
+        let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: topic }, { ma_feed_nhiet_do: topic }, { ma_feed_do_am: topic }, { ma_feed_nutnhan_den: topic }, { ma_feed_nutnhan_maybom : topic}] }).exec();
         let feed_name = null;
         let plan_id = null;
 
@@ -126,6 +128,9 @@ export class EnvsenseService {
             feed_name = "ma_feed_nhiet_do";
         } else if (area.ma_feed_do_am === topic) {
             feed_name = "ma_feed_do_am";
+        } else if (area.ma_feed_nutnhan_den == topic) {
+            feed_name = "ma_feed_nutnhan_den";
+            return { "feed_name": feed_name, "evaluate": 0 };
         }
         plan_id = area.ke_hoach_id;
 
@@ -221,7 +226,6 @@ export class EnvsenseService {
         }
     }
 	 
-
     // Get history chart data
     public async getHistoryData(start_time: string, end_time: string, userid: string, areaid: string) {
         let feeds = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid}]}, 'ma_feed_anh_sang ma_feed_nhiet_do ma_feed_do_am').exec()
@@ -246,5 +250,63 @@ export class EnvsenseService {
             do_am_chart_data: do_am_data
         }
     }
+
+    /*
+        Light sensor module
+     */
+
+    // Turn on or of light
+    public async turnOnLight(userid: string, areaid: string, turnon: number) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }, 'ma_feed_anh_sang ma_feed_nutnhan_den che_do_anh_sang').exec()
+            console.log(area.che_do_anh_sang);
+            if (area.che_do_anh_sang != "thu cong") return false;
+           
+            // send upadate message
+            const response = await axios.post(`https://io.adafruit.com/api/v2/${area.ma_feed_nutnhan_den}/data`, {
+                value: turnon
+            }, {
+                headers: {
+                    'X-AIO-Key': adafenv.activekey
+                }
+            });
+            console.log(response.data); // Handle response data here
+            return true;
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return false;
+            // Handle error here
+        }
+    }
+
+    // Change light mode
+    public async changeLightMode(userid: string, areaid: string, mode: string) {
+        try {
+            let valid_modes = ["tu dong", "thu cong", "theo lich"];
+            if (!(valid_modes.includes(mode))) return "400";
+
+            await this.Khu_cay_trongModel.updateOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }, { $set: {che_do_anh_sang: mode}}).exec()
+
+            return "200";
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return "500";
+            // Handle error here
+        }
+    }
+
+    // Update Light butto's change
+    public async updateLightButtonChange(feed_name: string, feed_type: string, curr_val: number) {
+        let area = await this.Khu_cay_trongModel.findOne({ ma_feed_nutnhan_den: feed_name}).exec();
+        let user_id = area.nguoi_dung_id;
+        
+        return {
+            id: area._id,
+            nguoi_dung_id: user_id,
+            feed_type: feed_type,
+            curent_value: curr_val
+        }
+    }
+
 
 }
