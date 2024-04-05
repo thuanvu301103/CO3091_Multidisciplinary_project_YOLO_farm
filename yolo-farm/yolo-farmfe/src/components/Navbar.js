@@ -8,7 +8,9 @@ import {
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
 import Logo from '../assets/image/Logo.png'
+import { useParams } from "react-router-dom";
 export function Header() {
+
   const [openNav, setOpenNav] = React.useState(false);
  
   React.useEffect(() => {
@@ -77,12 +79,14 @@ export function Header() {
       <MobileNav open={openNav}>
         <div className="container mx-auto">
           <div className="flex items-center gap-x-1">
-            <Button fullWidth variant="text" size="sm" className="">
-              <span>Log In</span>
-            </Button>
-            <Button fullWidth variant="gradient" size="sm" className="">
-              <span>Sign in</span>
-            </Button>
+            <>
+              <Button fullWidth variant="text" size="sm" className="">
+                <span>Log In</span>
+              </Button>
+              <Button fullWidth variant="gradient" size="sm" className="">
+                <span>Sign in</span>
+              </Button>
+            </>
           </div>
         </div>
       </MobileNav>

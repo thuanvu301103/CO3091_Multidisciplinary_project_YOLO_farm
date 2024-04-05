@@ -25,7 +25,12 @@ let chartConfig = {
     options: {
         chart: {
             toolbar: {
-                show: false,
+                show: true,
+                tools: {
+                    zoom: true,
+                    pan: false,
+                    reset: true,
+                },
             },
         },
         title: {
@@ -34,7 +39,7 @@ let chartConfig = {
         dataLabels: {
             enabled: false,
         },
-        colors: ["#2986cc"],
+        colors: ["#cc0000"],
         stroke: {
             lineCap: "round",
             curve: "smooth",
@@ -93,13 +98,13 @@ let chartConfig = {
     },
 };
 
-export function MoistureHistory() {
+export function TempHistory() {
 
     // Get params from URL
     const paramURL = useParams();
     let userid = paramURL['userid'];
     let areaid = paramURL['areaid'];
-    const [moistureData, setMoistureData] = useState(null);
+    const [tempData, setTempData] = useState(null);
     const [chartData, setChartData] = useState(null);
 
 
@@ -111,7 +116,7 @@ export function MoistureHistory() {
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
                 let res_data = response.data;
-                setMoistureData(res_data['do_am']);
+                setTempData(res_data['nhiet_do']);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -125,7 +130,7 @@ export function MoistureHistory() {
                 const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/history?filter=year`;
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
-                let res_data = response.data['do_am_chart_data'];
+                let res_data = response.data['nhiet_do_chart_data'];
                 //console.log(res_data);
                 chartConfig['series'][0]['data'] = [];
                 chartConfig['options']['xaxis']['categories'] = [];
@@ -146,28 +151,31 @@ export function MoistureHistory() {
 
 
     return (
-        <Card>
+        <Card className='my-5'>
             <CardHeader
                 floated={false}
                 shadow={false}
                 color="transparent"
                 className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
             >
-                <div className="w-max rounded-lg bg-gray-900 p-5 text-white">
-                    {/* Icon here */}
+                <div className="w-max rounded-lg p-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
+                    </svg>
                 </div>
                 <div className="flex col-span-12 justify-between w-full">
                     <div className="w-fit">
                         <Typography variant="h6" color="blue-gray">
-                            Độ ẩm
+                            Nhiệt độ
                         </Typography>
                         <Typography
                             variant="small"
                             color="gray"
                             className="max-w-sm font-normal"
                         >
-                            {moistureData && moistureData.low_warning && moistureData.high_warning &&
-                                `Độ ẩm khuyến nghị: từ ${moistureData.low_warning} đến ${moistureData.high_warning}`}
+                            {tempData && tempData.low_warning && tempData.high_warning &&
+                                `Nhiệt độ khuyến nghị: từ ${tempData.low_warning} đến ${tempData.high_warning}`}
                         </Typography>
                     </div>
                     <div className="flex items-center">

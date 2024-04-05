@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { Header } from "../../components/Navbar";
 import {Sidebar} from "../../components/Sidebar";
+import {Footer} from "../../components/Footer"
 import { Typography, Button } from "@material-tailwind/react";
 import { TempHistory } from "./TempHistory";
 import { LightHistory } from "./LightHistory";
@@ -47,15 +48,15 @@ export function HistoryPage() {
                 <div className="col-span-10 grid grid-cols-12 gap-6 m-6">
                     <div className="flex col-span-12 justify-between items-center" style={{width:'100%'}}>
                         <Typography
-                            variant="h5"
-                            style={{color:'#444444'}}
+                            variant="h6"
+                            color="blue-gray"
                             className="mb-3 font-medium leading-[1.5] w-fit"
                             >
-                            Khu: {area_name}
-                            &nbsp; &nbsp; &nbsp; &nbsp;
-                            Kế hoạch: {plan_name}
+                            <span style={{fontWeight:'700'}}>Khu</span>: {area_name}
+                            <br/>
+                            <span style={{fontWeight:'700'}}>Kế hoạch</span>: {plan_name}
                         </Typography>
-                        <Link to='/detail'>
+                        <Link to={`/user/${userid}/area/${areaid}`}>
                             <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>
                                 Trở về
                             </Button>
@@ -68,6 +69,7 @@ export function HistoryPage() {
                     </div>
                 </div>
             </div>
+            <Footer></Footer>
         </>
     )
 }

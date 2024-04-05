@@ -3,7 +3,7 @@ import axios from "axios";
 import logo from './logo.svg';
 import './App.css';
 import { DetailPage } from './pages/detailPage/DetailPage'
-import { HistoryPage } from "./pages/chartPage/HistoryPage";
+import { HistoryPage } from "./pages/historyPage/HistoryPage";
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
 import {

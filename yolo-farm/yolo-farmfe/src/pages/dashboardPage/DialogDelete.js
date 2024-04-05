@@ -25,7 +25,7 @@ export function DialogDelete (props) {
                 <DialogBody className="text-center ">
                     Bạn có chắc chắn muốn xóa khu cây trồng
                     <span className="mx-1" style={{color:'#ef4444'}}>
-                        {values.row.name}
+                        {values.row.ten}
                     </span>
                     không?
                 </DialogBody>

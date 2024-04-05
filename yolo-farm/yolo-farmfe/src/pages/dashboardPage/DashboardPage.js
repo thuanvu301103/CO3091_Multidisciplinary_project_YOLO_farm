@@ -8,6 +8,7 @@ import { DataGrid, GridToolbarQuickFilter, GridToolbar } from '@mui/x-data-grid'
 import { Link } from 'react-router-dom';
 import { Header } from "../../components/Navbar";
 import { Sidebar } from "../../components/Sidebar";
+import { Footer } from '../../components/Footer';
 import {DialogDelete} from "./DialogDelete";
 import {DialogUpdate} from "./DialogUpdate";
 import {DialogView} from "./DialogView";
@@ -95,13 +96,13 @@ export function DashboardPage() {
     		};
     		fetchData();
   	}, [userid]);
+
 	
 	
   const columns = React.useMemo(
     () => data.columns.filter((column) => VISIBLE_FIELDS.includes(column.field)),
     [data.columns]
   );
-
   return (
     <>
       <Header />
@@ -143,6 +144,7 @@ export function DashboardPage() {
             </Grid>
         </div>
       </div>
+      <Footer></Footer>
     </>
   );
 }
