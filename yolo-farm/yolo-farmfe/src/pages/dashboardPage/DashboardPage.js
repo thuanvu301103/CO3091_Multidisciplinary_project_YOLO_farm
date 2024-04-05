@@ -66,11 +66,12 @@ export function DashboardPage() {
     		const fetchData = async () => {
       			try {
         			const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/list`;
-				console.log ('apiURL = ', apiUrl);
+				    console.log ('apiURL = ', apiUrl);
         			// Make the HTTP GET request using Axios
         			const response = await axios.get(apiUrl);
-				let res_data = response.data; 
-				for (let i in res_data) {
+                    let res_data = response.data;
+                        console.log('Response: ', res_data);
+				    for (let i in res_data) {
 					res_data[i]['operate'] = true;
 					res_data[i]['no'] = i+1;
 					//data[i]['id'] = data[i]['_id'];		

@@ -42,6 +42,7 @@ export class EnvsenseService {
                 this.mqtt_client.subscribe(feeds.ma_feed_do_am);
                 this.mqtt_client.subscribe(feeds.ma_feed_nutnhan_den);
                 this.mqtt_client.subscribe(feeds.ma_feed_nutnhan_maybom);
+                this.mqtt_client.subscribe(feeds.ma_feed_automatic);
             }
             console.log('Connected to Adafruit IO MQTT');
 
@@ -251,6 +252,34 @@ export class EnvsenseService {
         }
     }
 
+    // Automatic mode
+    public async changeAutomaticMode(userid: string, areaid: string, turnon: number) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            console.log(area.ma_feed_automatic);
+            // send upadate message
+            const response = await axios.post(`https://io.adafruit.com/api/v2/${area.ma_feed_automatic}/data`, {
+                value: turnon
+            }, {
+                headers: {
+                    'X-AIO-Key': adafenv.activekey
+                }
+            });
+            console.log(response.data); // Handle response data here
+
+            let result = this.changeLightMode(userid, areaid, "tu dong");
+            /*
+                Change other mode
+            */
+
+            return true;
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return false;
+            // Handle error here
+        }
+    }
+
     /*
         Light sensor module
      */
@@ -295,7 +324,7 @@ export class EnvsenseService {
         }
     }
 
-    // Update Light butto's change
+    // Update Light button's change
     public async updateLightButtonChange(feed_name: string, feed_type: string, curr_val: number) {
         let area = await this.Khu_cay_trongModel.findOne({ ma_feed_nutnhan_den: feed_name}).exec();
         let user_id = area.nguoi_dung_id;

@@ -4,6 +4,7 @@
 ### Install necessary packages for back-end server using npm
 - Integrate Adafruit IO's MQTT service: ```npm install mqtt```
 - Run web apps concurrently: ```npm install -g concurrently```
+- Scheduled tasks: ```npm install @nestjs/schedule```
 ### Install necessary packages for front-end server using npm
 - Handle routing in React applications: ```npm install react-router-dom```
 
@@ -154,6 +155,10 @@ bootstrap();
 	}
 ```
 
+### Schedule tasks
+- We use ```Cron``` to schedule tasks. In our senario, we want to schedule the task of turning on orr off light relay  
+- 
+
 ### API Doc
 #### About the SSE message that be-server sends to fe-server whenerver there is change in adafruit server:
 - Message format:
@@ -299,6 +304,8 @@ Both dynamic route parameters and query parameters are fully compatible with the
 		{500: "Internal Server Error"}
 		{400: "Bad Request"}
 
+
+
 ## Config YOLO-Farm frontend server ```yolo-farmfe```
 ### Define routs
 ```javascript
@@ -339,7 +346,7 @@ function App() {
 export default App;
 ```
 
-### Realtime data streaming using server-sent events(SSE) - Receiving messages from fe-server 
+### Realtime data streaming using server-sent events(SSE) - Receiving messages in fe-server 
 ```javascript
 // file: DetailPage.js
     // Handle SSE messages from be-server
@@ -425,6 +432,6 @@ export default App;
 ```
 
 ### Sitemap
-- ```localhost:3001/user/{userid}/arealist```: list of plant area of a user with specific userid
-- ```localhost:3001/user/{userid}/area/{areaid}```: detail of plant area of a user with specific userid and areaid
-- ```localhost:3001/user/{userid}/area/{areaid}/history```: history of plant area of a user with specific userid and areaid
+- ```http://192.168.56.1:3001/user/{userid}/area/list```: list of plant area of a user with specific userid
+- ```http://192.168.56.1:3001/user/{userid}/area/{areaid}```: detail of plant area of a user with specific userid and areaid
+- ```http://192.168.56.1:3001/user/{userid}/area/{areaid}/history```: history of plant area of a user with specific userid and areaid

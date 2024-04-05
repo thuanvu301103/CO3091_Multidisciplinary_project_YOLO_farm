@@ -115,6 +115,7 @@ export function DetailPage(){
                             &nbsp; &nbsp; &nbsp; &nbsp;
                             Kế hoạch: {plan_name}
                         </Typography>
+
                         <div>
                             <Link to = "/history">
                                 <Button className="rounded-3xl mx-6" style={{height:'40px',backgroundColor:'#0BB489', color:'#ffffff'}}>
@@ -147,8 +148,7 @@ export function DetailPage(){
                             style={{fontSize:'100px', color: '#FCF671', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
-                                    {tempData && tempData.curent_value &&
-                                        `${tempData.curent_value}`}
+                                    {tempData && tempData.curent_value && `${tempData.curent_value}°C`}
                             </Typography>
 
                             <Typography
@@ -160,12 +160,12 @@ export function DetailPage(){
                             </Typography>
                             <Typography variant="h6" className="mb-4 text-gray-400 w-full">
                                     {tempData && tempData.low_warning && tempData.high_warning &&
-                                        `Nhiệt độ khuyến nghị: từ ${tempData.low_warning} đến ${tempData.high_warning}`}
+                                        `Khuyến nghị: từ ${tempData.low_warning}°C đến ${tempData.high_warning}°C`}
                             </Typography>
                                 <Button className="rounded-3xl" style={{ backgroundColor: 'white', color: '#4CA844', backgroundColor: 'rgb(255,255,255)' }}>
-                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? `Cao hơn giới hạn trên ${tempData.evaluate}`:null}
+                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? `Cao hơn giới hạn trên ${tempData.evaluate.toFixed(1)}%`:null}
                                     {tempData && (tempData.evaluate ==  0) ? `Tình trạng tốt`: null}
-                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${0-tempData.evaluate}`:null}
+                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)}%`:null}
                                     
                                 </Button>
                         </CardBody>
@@ -191,8 +191,7 @@ export function DetailPage(){
                             style={{fontSize:'100px', color: '#C0D82B', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
-                                    {lightData && lightData.curent_value &&
-                                        `${lightData.curent_value}`}
+                                    {lightData && lightData.curent_value && `${lightData.curent_value}%`}
                             </Typography>
                             <Typography
                             variant="h3"
@@ -203,11 +202,11 @@ export function DetailPage(){
                             </Typography>
                             <Typography variant="h6" className="mb-4 text-gray-400">
                                     {lightData && lightData.low_warning && lightData.high_warning &&
-                                        `Ánh sáng khuyến nghị: từ ${lightData.low_warning} đến ${lightData.high_warning}`}
+                                        `Khuyến nghị: từ ${lightData.low_warning}% đến ${lightData.high_warning}%`}
                             </Typography>
                             <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? `Cao hơn giới hạn trên ${lightData.evaluate}`: null}
-                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${0 - lightData.evaluate}`:null}
+                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? `Cao hơn giới hạn trên ${lightData.evaluate.toFixed(1)}%`: null}
+                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${(0 - lightData.evaluate).toFixed(1)}%`:null}
                                     {lightData && lightData.evaluate == 0 ? `Tình trạng tốt` : null}
                             </Button>
                         </CardBody>
@@ -232,8 +231,7 @@ export function DetailPage(){
                             style={{fontSize:'100px', color: '#1152FA', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
-                                    {midData && midData.curent_value &&
-                                        `${midData.curent_value}`}
+                                    {midData && midData.curent_value && `${midData.curent_value}%`}
                             </Typography>
                             <Typography
                             variant="h3"
@@ -244,11 +242,11 @@ export function DetailPage(){
                             </Typography>
                             <Typography variant="h6" className="mb-4 text-gray-400">
                                     {midData && midData.low_warning && midData.high_warning &&
-                                        `Độ ẩm khuyến nghị: từ ${midData.low_warning} đến ${midData.high_warning}`}
+                                        `Khuyến nghị: từ ${midData.low_warning}% đến ${midData.high_warning}%`}
                             </Typography>
                             <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                    {midData && midData.evaluate && midData.evaluate > 0 ? `Cao hơn giới hạn trên ${midData.evaluate}`:null}
-                                    {midData && midData.evaluate && midData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${0 - midData.evaluate}`:null}
+                                    {midData && midData.evaluate && midData.evaluate > 0 ? `Cao hơn giới hạn trên ${midData.evaluate.toFixed(1)}`:null}
+                                    {midData && midData.evaluate && midData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}`:null}
                                     {midData && midData.evaluate == 0 ? `Tình trạng tốt`:null}
                             </Button>
                         </CardBody>

@@ -33,7 +33,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/user/:userid/arealist' element={<DashboardPage/>}/>
+        <Route path='/user/:userid/area/list' element={<DashboardPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
         <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>

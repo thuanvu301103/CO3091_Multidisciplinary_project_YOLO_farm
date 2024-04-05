@@ -31,6 +31,9 @@ export class Khu_cay_trong {
     ma_feed_nutnhan_maybom: string;
 
     @Prop()
+    ma_feed_automatic: string;
+
+    @Prop()
     che_do_anh_sang: string;
 
     @Prop()

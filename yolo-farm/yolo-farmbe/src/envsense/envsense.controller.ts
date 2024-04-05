@@ -86,6 +86,18 @@ export class EnvsenseController {
         return this.envsenseService.getHistoryData(formatted_start_time, formatted_end_time, userid, areaid);
     }
 
+    @Get('user/:userid/plantarea/:areaid/automatic/turnon/:turnon')
+    async changeAutomaticMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string,
+        @Param('turnon') turnon: number,
+        @Res() res
+    ) {
+        let result = await this.envsenseService.changeAutomaticMode(userid, areaid, turnon);
+        if (result) res.status(200).send('OK');
+        else res.status(403).send('Forbidden');
+    }
+
     /*
      * Ex: http://127.0.0.1:3000/envsense/user/65f0529c5933e074166715a5/plantarea/65f0529c5933e074166715a8/light/turnon/1
      */
@@ -96,6 +108,7 @@ export class EnvsenseController {
         @Param('turnon') turnon: number,
         @Res() res
     ) {
+	console.log("Working...");
         let result = await this.envsenseService.turnOnLight(userid, areaid, turnon);
         if (result) res.status(200).send('OK');
         else res.status(403).send('Forbidden: manual mode is off');
