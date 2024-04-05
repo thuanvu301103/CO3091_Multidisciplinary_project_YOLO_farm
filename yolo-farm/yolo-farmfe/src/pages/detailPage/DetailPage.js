@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import {Header} from "../../components/Navbar";
 import {Sidebar} from "../../components/Sidebar";
-import { Button, CardFooter, Switch } from "@material-tailwind/react";
+import { Footer } from '../../components/Footer';
+import { Button, Switch } from "@material-tailwind/react";
 import {
   Card,
   CardHeader,
@@ -141,22 +142,22 @@ export function DetailPage(){
                 <div className="col-span-10 grid grid-cols-12 gap-6 m-6">
                     <div className="flex col-span-12 justify-between items-center" style={{width:'100%'}}>
                         <Typography
-                            variant="h5"
-                            style={{color:'#444444'}}
+                            variant="h6"
+                            color="blue-gray"
                             className="mb-3 font-medium leading-[1.5] w-fit"
                             >
-                            Khu: {area_name}
-                            &nbsp; &nbsp; &nbsp; &nbsp;
-                            Kế hoạch: {plan_name}
+                            <span style={{fontWeight:'700'}}>Khu</span>: {area_name}
+                            <br/>
+                            <span style={{fontWeight:'700'}}>Kế hoạch</span>: {plan_name}
                         </Typography>
 
                         <div>
-                            <Link to = "/history">
+                            <Link to = {`/user/${userid}/area/${areaid}/history`}>
                                 <Button className="rounded-3xl mx-6" style={{height:'40px',backgroundColor:'#0BB489', color:'#ffffff'}}>
                                     Xem lịch sử
                                 </Button>
                             </Link>
-                            <Link to = "/">
+                            <Link to = {`/user/${userid}/area/list`}>
                                 <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>
                                     Trở về
                                 </Button>
@@ -193,7 +194,7 @@ export function DetailPage(){
                         </CardHeader>
                         <CardBody className="relative py-14 px-6 md:px-12">
                             <Typography
-                            style={{fontSize:'100px', color: '#FCF671', fontWeight:'bold'}}
+                            style={{fontSize:'80px', color: '#FCF671', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
                                     {tempData && tempData.curent_value && `${tempData.curent_value}°C`}
@@ -210,11 +211,10 @@ export function DetailPage(){
                                     {tempData && tempData.low_warning && tempData.high_warning &&
                                         `Khuyến nghị: từ ${tempData.low_warning}°C đến ${tempData.high_warning}°C`}
                             </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'white', color: '#4CA844', backgroundColor: 'rgb(255,255,255)' }}>
-                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? `Cao hơn giới hạn trên ${tempData.evaluate.toFixed(1)}%`:null}
-                                    {tempData && (tempData.evaluate ==  0) ? `Tình trạng tốt`: null}
-                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)}%`:null}
-                                    
+                                <Button className="rounded-3xl" style={{backgroundColor: 'rgb(255,255,255)' }}>
+                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? <span style={{color:'#dc3545'}}>Cao hơn giới hạn trên {tempData.evaluate.toFixed(1)}%</span>:null}
+                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? <span style={{color:'#dc3545'}}>Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)}%</span>:null}
+                                    {tempData && (tempData.evaluate ==  0) ? <span style={{color:'#28a745'}}>Tình trạng tốt</span>: null}
                                 </Button>
                         </CardBody>
                         </Card>
@@ -236,7 +236,7 @@ export function DetailPage(){
                         </CardHeader>
                         <CardBody className="relative py-14 px-6 md:px-12">
                             <Typography
-                            style={{fontSize:'100px', color: '#C0D82B', fontWeight:'bold'}}
+                            style={{fontSize:'80px', color: '#C0D82B', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
                                     {lightData && lightData.curent_value && `${lightData.curent_value}%`}
@@ -252,10 +252,10 @@ export function DetailPage(){
                                     {lightData && lightData.low_warning && lightData.high_warning &&
                                         `Khuyến nghị: từ ${lightData.low_warning}% đến ${lightData.high_warning}%`}
                             </Typography>
-                            <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? `Cao hơn giới hạn trên ${lightData.evaluate.toFixed(1)}%`: null}
-                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${(0 - lightData.evaluate).toFixed(1)}%`:null}
-                                    {lightData && lightData.evaluate == 0 ? `Tình trạng tốt` : null}
+                            <Button className="rounded-3xl" style={{backgroundColor:'rgb(255,255,255)'}}>
+                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? <span style={{color:'#dc3545'}}>Cao hơn giới hạn trên {lightData.evaluate.toFixed(1)}%</span>: null}
+                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? <span style={{color:'#dc3545'}}>Thấp hơn giới hạn dưới {(0 - lightData.evaluate).toFixed(1)}%</span>:null}
+                                    {lightData && lightData.evaluate == 0 ? <span style={{color:'#28a745'}}>Tình trạng tốt</span> : null}
                             </Button>
                         </CardBody>
                         </Card>
@@ -276,7 +276,7 @@ export function DetailPage(){
                         </CardHeader>
                         <CardBody className="relative py-14 px-6 md:px-12">
                             <Typography
-                            style={{fontSize:'100px', color: '#1152FA', fontWeight:'bold'}}
+                            style={{fontSize:'80px', color: '#1152FA', fontWeight:'bold'}}
                             className="mb-3 font-medium leading-[1.5]"
                             >
                                     {midData && midData.curent_value && `${midData.curent_value}%`}
@@ -292,16 +292,17 @@ export function DetailPage(){
                                     {midData && midData.low_warning && midData.high_warning &&
                                         `Khuyến nghị: từ ${midData.low_warning}% đến ${midData.high_warning}%`}
                             </Typography>
-                            <Button className="rounded-3xl" style={{backgroundColor:'white', color:'#4CA844', backgroundColor:'rgb(255,255,255)'}}>
-                                    {midData && midData.evaluate && midData.evaluate > 0 ? `Cao hơn giới hạn trên ${midData.evaluate.toFixed(1)}`:null}
-                                    {midData && midData.evaluate && midData.evaluate < 0 ? `Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}`:null}
-                                    {midData && midData.evaluate == 0 ? `Tình trạng tốt`:null}
+                            <Button className="rounded-3xl" style={{backgroundColor:'rgb(255,255,255)'}}>
+                                    {midData && midData.evaluate && midData.evaluate > 0 ? <span style={{color:'#dc3545'}}>Cao hơn giới hạn trên {midData.evaluate.toFixed(1)}</span> :null}
+                                    {midData && midData.evaluate && midData.evaluate < 0 ? <span style={{color:'#dc3545'}}>Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}</span>:null}
+                                    {midData && midData.evaluate == 0 ? <span style={{color:'#28a745'}}>Tình trạng tốt</span>:null}
                             </Button>
                         </CardBody>
                         </Card>
                     </div>
                 </div>
             </div>
+            <Footer></Footer>
         </>
     )
 }

@@ -13,10 +13,10 @@ export function DialogUpdate(props) {
     const values = props.values;
     const handleOpen = () => setOpen(!open);
 
-    const [name, setName] = useState(values.row.name);
-    const [lighting, setLighting] = useState(values.row.lighting);
-    const [temperature, setTemperature] = useState(values.row.temperature);
-    const [moisture, setMoisture] = useState(values.row.phone);
+    const [name, setName] = useState(values.row.ten);
+    const [lighting, setLighting] = useState(values.row.ma_feed_anh_sang);
+    const [temperature, setTemperature] = useState(values.row.ma_feed_nhiet_do);
+    const [moisture, setMoisture] = useState(values.row.ma_feed_do_am);
 
     const handleNameChange = (e) => setName(e.target.value);
     const handleLightingChange = (e) => setLighting(e.target.value);
@@ -35,9 +35,9 @@ export function DialogUpdate(props) {
                 <form className="w-100 max-w-screen-lg sm:w-96" method="post">
                     <div className="mb-1 flex flex-col gap-3">
                         <Input size="lg" type="text" name='name' label="Tên khu cây trồng" value={name} onChange={handleNameChange} required/>   
-                        <Input size="lg"  type="number" name='lighting' label="Ánh sáng" value={lighting}  onChange={handleLightingChange} required/>     
-                        <Input size="lg" type='number' name='temperature' label="Nhiệt độ"  value={temperature} onChange={handleTemperatureChange} required/>     
-                        <Input size="lg" type="number" name='phone_number' label="Độ ẩm" value={moisture} onChange={handleMoistureChange} required/>     
+                        <Input size="lg"  type="text" name='lighting' label="Ánh sáng" value={lighting}  onChange={handleLightingChange} required/>     
+                        <Input size="lg" type='text' name='temperature' label="Nhiệt độ"  value={temperature} onChange={handleTemperatureChange} required/>     
+                        <Input size="lg" type="text" name='moisture' label="Độ ẩm" value={moisture} onChange={handleMoistureChange} required/>     
                     </div>
                     <Button className="mt-6" type="submit" fullWidth style={{backgroundColor: '#3758F9'}}>
                     Lưu thay đổi
