@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import {Header} from "../../components/Navbar";
 import {Sidebar} from "../../components/Sidebar";
-import { Button, CardFooter } from "@material-tailwind/react";
+import { Button, CardFooter, Switch } from "@material-tailwind/react";
 import {
   Card,
   CardHeader,
@@ -10,31 +10,65 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
-import { SSEComponent } from "../../components/SSEComponent";
 import LightImg from '../../assets/image/Light.jpg';
 import TempImg from '../../assets/image/Temp.jpg';
 import MoistureImg from '../../assets/image/Moisture.jpg';
 import {useParams} from "react-router-dom";
 
-
 export function DetailPage(){
-
-	// Get params from URL
-	const paramURL = useParams();
-	let userid = paramURL['userid'];
-	let areaid = paramURL['areaid'];
+    // Get params from URL
+    const paramURL = useParams();
+    let userid = paramURL['userid'];
+    let areaid = paramURL['areaid'];
     const [tempData, setTempData] = useState(null);
     const [lightData, setLightData] = useState(null);
     const [midData, setMidData] = useState(null);
     const [area_name, setAreaName] = useState(null);
     const [plan_name, setPlanName] = useState(null);
+    const [automatic_state, setAutomaticState] = useState(null);
+    const [initial, setInitial] = useState(true);
 
- 
+    // fetch automatic state data
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+
+                let apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/automatic`;
+                const response = await axios.get(apiUrl);
+                let res_data = response.data;
+                console.log(res_data);
+                if (res_data == '1') setAutomaticState(true);
+                else setAutomaticState(false);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    
+    useEffect(() => {
+        
+        const fetchData = async () => {
+            // This function will be called whenever automaticState changes
+            let turnon = 0;
+            if (automatic_state == true) turnon = 1;
+            let apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/automatic/turnon/${turnon}`;
+            const response = await axios.get(apiUrl);
+        };
+        // If the change is due to initial of automaic button then do nothing
+        if (initial == true) return;
+        fetchData();
+        // You can perform any other actions based on the updated state here
+    }, [automatic_state]); // Specify automaticState as a dependency
+    
+
 	// Fetch data for the first time enter detail page
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
+                let apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}`;
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
                 let res_data = response.data;
@@ -71,7 +105,7 @@ export function DetailPage(){
                         setTempData(eventData);
                     } else if (eventData['feed_type'] === 'ma_feed_do_am') {
                         setMidData(eventData);
-                    }
+                    } 
                     // Handle the received event data
                 };
 
@@ -91,11 +125,11 @@ export function DetailPage(){
         fetchData();
     }, []);
 
-
     /*
     console.log ('Area\'s name: ', area_name);
     console.log ('Plan\'s name: ', plan_name);
     */
+    console.log('Automatic mode: ', automatic_state);
 
     return (
         <>
@@ -128,7 +162,21 @@ export function DetailPage(){
                                 </Button>
                             </Link>
                         </div>
+
                     </div>
+
+                    <div className="col-span-12">
+                        <Switch
+                            color="green"
+                            label="Chế độ tự động"
+                            checked={automatic_state}
+                            onChange={() => {
+                                setInitial(false);
+                                setAutomaticState(!automatic_state);
+                            }}
+                        />
+                    </div>
+
                     <div className="col-span-4">
                         <Card
                         shadow={false}

@@ -25,6 +25,7 @@ export class EnvsenseController {
             console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
             // Handle the message as needed
             let res_data = null;
+            if (detail.feed_name == 'ma_feed_automatic') return;
             if (detail.feed_name == 'ma_feed_nutnhan_den') res_data = JSON.stringify(await this.envsenseService.updateLightButtonChange(topic, detail.feed_name, message - 0));
             else res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
 			console.log('Sent data: ', res_data);
@@ -90,13 +91,22 @@ export class EnvsenseController {
     async changeAutomaticMode(
         @Param('userid') userid: string,
         @Param('areaid') areaid: string,
-        @Param('turnon') turnon: number,
-        @Res() res
+        @Param('turnon') turnon: number
     ) {
         let result = await this.envsenseService.changeAutomaticMode(userid, areaid, turnon);
-        if (result) res.status(200).send('OK');
-        else res.status(403).send('Forbidden');
+        return result;
     }
+
+    @Get('user/:userid/plantarea/:areaid/automatic')
+    async getCurrAutomaticMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string
+    ) {
+        let result = await this.envsenseService.getCurrAutomaticMode(userid, areaid);
+        console.log('Automatic mode JSON: ', result);
+        return result;
+    }
+
 
     /*
      * Ex: http://127.0.0.1:3000/envsense/user/65f0529c5933e074166715a5/plantarea/65f0529c5933e074166715a8/light/turnon/1
@@ -108,7 +118,7 @@ export class EnvsenseController {
         @Param('turnon') turnon: number,
         @Res() res
     ) {
-	console.log("Working...");
+	    //console.log("Working...");
         let result = await this.envsenseService.turnOnLight(userid, areaid, turnon);
         if (result) res.status(200).send('OK');
         else res.status(403).send('Forbidden: manual mode is off');

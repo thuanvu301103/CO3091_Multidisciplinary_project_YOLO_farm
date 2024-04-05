@@ -59,36 +59,40 @@ export class EnvsenseService {
 
     // Send updated data to fe server
     public async updatePlantAreaChage(feed_name: string, feed_type: string, curr_val: number, eval_val: number) {
-        let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: feed_name }, { ma_feed_do_am: feed_name }, { ma_feed_nhiet_do: feed_name }] }).exec();
-        let user_id = area.nguoi_dung_id;
-        let plan_id = area.ke_hoach_id;
-        /*
-        let ma_feed_anh_sang = area.ma_feed_anh_sang;
-        let ma_feed_nhiet_do = area.ma_feed_nhiet_do;
-	    let ma_feed_do_am = area.ma_feed_do_am;
-        */
-        let plan = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
-        let high_warning = null;
-        let low_warning = null;
-        if (feed_type === 'ma_feed_anh_sang') {
-            high_warning = plan.gioi_han_tren_anh_sang;
-            low_warning = plan.gioi_han_duoi_anh_sang;
-        } else if (feed_type === 'ma_feed_nhiet_do') {
-            high_warning = plan.gioi_han_tren_nhiet_do;
-            low_warning = plan.gioi_han_duoi_nhiet_do;
-        } else if (feed_type === 'ma_feed_do_am') {
-            high_warning = plan.gioi_han_tren_do_am;
-            low_warning = plan.gioi_han_duoi_do_am;
-        }
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: feed_name }, { ma_feed_do_am: feed_name }, { ma_feed_nhiet_do: feed_name }] }).exec();
+            let user_id = area.nguoi_dung_id;
+            let plan_id = area.ke_hoach_id;
+            /*
+            let ma_feed_anh_sang = area.ma_feed_anh_sang;
+            let ma_feed_nhiet_do = area.ma_feed_nhiet_do;
+            let ma_feed_do_am = area.ma_feed_do_am;
+            */
+            let plan = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
+            let high_warning = null;
+            let low_warning = null;
+            if (feed_type === 'ma_feed_anh_sang') {
+                high_warning = plan.gioi_han_tren_anh_sang;
+                low_warning = plan.gioi_han_duoi_anh_sang;
+            } else if (feed_type === 'ma_feed_nhiet_do') {
+                high_warning = plan.gioi_han_tren_nhiet_do;
+                low_warning = plan.gioi_han_duoi_nhiet_do;
+            } else if (feed_type === 'ma_feed_do_am') {
+                high_warning = plan.gioi_han_tren_do_am;
+                low_warning = plan.gioi_han_duoi_do_am;
+            }
 
-        return {
-            id: area._id,
-            nguoi_dung_id: user_id,
-            feed_type: feed_type,
-            curent_value: curr_val,
-            evaluate: eval_val,
-            high_warning: high_warning,
-            low_warning: low_warning
+            return {
+                id: area._id,
+                nguoi_dung_id: user_id,
+                feed_type: feed_type,
+                curent_value: curr_val,
+                evaluate: eval_val,
+                high_warning: high_warning,
+                low_warning: low_warning
+            }
+        } catch (error) {
+            return null;
         }
     }
 
@@ -118,43 +122,52 @@ export class EnvsenseService {
 
     // Evaluate curent value
     public async evaluateVal(topic, message): Promise<{ feed_name: string; evaluate: number; }> {
-        let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: topic }, { ma_feed_nhiet_do: topic }, { ma_feed_do_am: topic }, { ma_feed_nutnhan_den: topic }, { ma_feed_nutnhan_maybom : topic}] }).exec();
-        let feed_name = null;
-        let plan_id = null;
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $or: [{ ma_feed_anh_sang: topic }, { ma_feed_nhiet_do: topic }, { ma_feed_do_am: topic }, { ma_feed_nutnhan_den: topic }, { ma_feed_nutnhan_maybom: topic }, { ma_feed_automatic: topic }] }).exec();
+            let feed_name = null;
+            let plan_id = null;
 
-        // Identify feed_name of change
-        if (area.ma_feed_anh_sang === topic) {
-            feed_name = "ma_feed_anh_sang";
-        } else if (area.ma_feed_nhiet_do === topic) {
-            feed_name = "ma_feed_nhiet_do";
-        } else if (area.ma_feed_do_am === topic) {
-            feed_name = "ma_feed_do_am";
-        } else if (area.ma_feed_nutnhan_den == topic) {
-            feed_name = "ma_feed_nutnhan_den";
-            return { "feed_name": feed_name, "evaluate": 0 };
+            // Identify feed_name of change
+            if (area.ma_feed_anh_sang === topic) {
+                feed_name = "ma_feed_anh_sang";
+            } else if (area.ma_feed_nhiet_do === topic) {
+                feed_name = "ma_feed_nhiet_do";
+            } else if (area.ma_feed_do_am === topic) {
+                feed_name = "ma_feed_do_am";
+            } else if (area.ma_feed_nutnhan_den == topic) {
+                feed_name = "ma_feed_nutnhan_den";
+                return { "feed_name": feed_name, "evaluate": 0 };
+            } else if (area.ma_feed_automatic == topic) {
+                feed_name = "ma_feed_automatic";
+                return { "feed_name": feed_name, "evaluate": 0 };
+            }
+            plan_id = area.ke_hoach_id;
+
+            // Identify limits of change
+            let standard = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
+            let high_level = null;
+            let low_level = null;
+            if (feed_name == "ma_feed_anh_sang") {
+                high_level = standard.gioi_han_tren_anh_sang;
+                low_level = standard.gioi_han_duoi_anh_sang;
+            } else if (feed_name == "ma_feed_nhiet_do") {
+                high_level = standard.gioi_han_tren_nhiet_do;
+                low_level = standard.gioi_han_duoi_nhiet_do;
+            } else if (feed_name == "ma_feed_do_am") {
+                high_level = standard.gioi_han_tren_do_am;
+                low_level = standard.gioi_han_duoi_do_am;
+            }
+
+            let evaluate = 0;
+            // Calculate evaluation value which the condition of values
+            if (message < low_level) evaluate = message - low_level;
+            else if (message > high_level) evaluate = message - high_level;
+            return { "feed_name": feed_name, "evaluate": evaluate };
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return { "feed_name": '', "evaluate": 0 };
+            // Handle error here
         }
-        plan_id = area.ke_hoach_id;
-
-        // Identify limits of change
-        let standard = await this.Ke_hoachModel.findOne({ _id: plan_id }).exec();
-        let high_level = null;
-        let low_level = null;
-        if (feed_name == "ma_feed_anh_sang") {
-            high_level = standard.gioi_han_tren_anh_sang;
-            low_level = standard.gioi_han_duoi_anh_sang;
-        } else if (feed_name == "ma_feed_nhiet_do") {
-            high_level = standard.gioi_han_tren_nhiet_do;
-            low_level = standard.gioi_han_duoi_nhiet_do;
-        } else if (feed_name == "ma_feed_do_am") {
-            high_level = standard.gioi_han_tren_do_am;
-            low_level = standard.gioi_han_duoi_do_am;
-        }
-
-        let evaluate = 0;
-        // Calculate evaluation value which the condition of values
-        if (message < low_level) evaluate = message - low_level;
-        else if (message > high_level) evaluate = message - high_level;
-        return { "feed_name": feed_name, "evaluate": evaluate };
     }
 
     // Get list of plant areas (khu_cay_trong) of one user
@@ -252,7 +265,9 @@ export class EnvsenseService {
         }
     }
 
-    // Automatic mode
+    /** Automatic 
+     */
+    // Change Automatic mode
     public async changeAutomaticMode(userid: string, areaid: string, turnon: number) {
         try {
             let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
@@ -280,8 +295,24 @@ export class EnvsenseService {
         }
     }
 
-    /*
-        Light sensor module
+    // Get curent Automatic mode
+    public async getCurrAutomaticMode(userid: string, areaid: string) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            // send upadate message
+            const response = await axios.get(`https://io.adafruit.com/api/v2/${area.ma_feed_automatic}/data?limit=1`);
+            // console.log(response.data); // Handle response data here
+            let result = response.data[0].value;
+            console.log('Automatic mode: ', result );
+            return result;
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return 0;
+            // Handle error here
+        }
+    }
+
+    /**Light sensor module
      */
 
     // Turn on or of light
