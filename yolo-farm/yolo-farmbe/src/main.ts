@@ -7,7 +7,7 @@ async function bootstrap() {
 
 	// Enable CORS with specific origin
   	app.enableCors({
-    		origin: 'http://192.168.56.1:3001', // Allow requests from this origin
+    		origin: 'http://localhost:3001', // Allow requests from this origin
 		// Other CORS options can be configured here
   	});
 
