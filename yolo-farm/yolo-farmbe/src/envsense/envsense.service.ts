@@ -282,7 +282,9 @@ export class EnvsenseService {
             });
             console.log(response.data); // Handle response data here
 
-            let result = this.changeLightMode(userid, areaid, "tu dong");
+            let result = null;
+            if (turnon == 1) result = this.changeLightMode(userid, areaid, "tu dong");
+            else result = this.changeLightMode(userid, areaid, "thu cong");
             /*
                 Change other mode
             */
