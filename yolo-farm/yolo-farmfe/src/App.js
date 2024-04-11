@@ -5,6 +5,8 @@ import './App.css';
 import { DetailPage } from './pages/detailPage/DetailPage'
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
+import {TempSchedulePage} from './pages/schedulePage/tempSchedulePage/TempSchedulePage';
+import { MidSchedulePage } from "./pages/schedulePage/midSchedulePage/MidSchedulePage";
 import {
   BrowserRouter as Router,
   Switch,
