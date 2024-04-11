@@ -6,6 +6,8 @@ import { DetailPage } from './pages/detailPage/DetailPage'
 import { HistoryPage } from "./pages/historyPage/HistoryPage";
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
+import {TempSchedulePage} from './pages/schedulePage/tempSchedulePage/TempSchedulePage';
+import { MidSchedulePage } from "./pages/schedulePage/midSchedulePage/MidSchedulePage";
 import {
   BrowserRouter as Router,
   Switch,
@@ -37,6 +39,8 @@ function App() {
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
         <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
+        <Route path='/tempschedule' element={<TempSchedulePage/>}/>
+        <Route path='/midschedule' element={<MidSchedulePage/>}/>
       </Routes>
       {/* <DetailPage></DetailPage> */}
       {/* <HistoryPage></HistoryPage> */}

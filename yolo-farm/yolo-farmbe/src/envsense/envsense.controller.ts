@@ -6,22 +6,18 @@ export class EnvsenseController {
 
     constructor(private readonly envsenseService: EnvsenseService) { }
 
-	@Get()
-	async streamEvent(@Res() res) {
-		// Set up HTTP header for stream Event
-		res.setHeader('Content-Type', 'text/event-stream');
+    @Get()
+    async streamEvent(@Res() res) {
+	// Set up HTTP header for stream Event
+	res.setHeader('Content-Type', 'text/event-stream');
     	res.setHeader('Cache-Control', 'no-cache');
     	res.flushHeaders();
-
-		// Sent first message when connection iss esstablished
-		//res.write();
 	
-		// Sent message when changes occurred	
-		this.envsenseService.mqtt_client.on('message', async (topic, message) => {
+	// Sent message when changes occurred	
+	this.envsenseService.mqtt_client.on('message', async (topic, message) => {
 
-            let detail = await this.envsenseService.evaluateVal(topic, message);
-            console.log(detail);
-
+        let detail = await this.envsenseService.evaluateVal(topic, message);
+        console.log(detail);
             console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
             // Handle the message as needed
             let res_data = null;
@@ -30,8 +26,9 @@ export class EnvsenseController {
             else res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
 			console.log('Sent data: ', res_data);
             res.write("data:" + res_data + "\n\n");
+
         });
-	}
+    }
     
     @Get('user/:id/plantarea/list')
     async getListPlantArea(@Param('id') id: string): Promise<any[]> {
@@ -63,8 +60,6 @@ export class EnvsenseController {
         let day = curr_date.getDate();
         let formatted_start_time = null;
         let formatted_end_time = null;
-        //const month = ('0' + (curr_date.getMonth() + 1)).slice(-2); // Adding 1 to month because it's zero-based
-        //const day = ('0' + curr_date.getDate()).slice(-2);
 
         // Construct the formatted string
         //const formatted_date = `${year}-${month}-${day}T${hours}:${minutes}`;
