@@ -23,9 +23,9 @@ export function DialogCreate() {
                 <form className="w-100 max-w-screen-lg sm:w-96" method="post">
                     <div className="mb-1 flex flex-col gap-3">
                         <Input size="lg" type="text" name='name' label="Tên khu cây trồng" required/>   
-                        <Input size="lg"  type="number" name='lighting' label="Ánh sáng" required/>     
-                        <Input size="lg" type='number' name='temperature' label="Nhiệt độ"  required/>     
-                        <Input size="lg" type="number" name='phone_number' label="Độ ẩm" required/>   
+                        <Input size="lg"  type="text" name='lighting' label="Ánh sáng" required/>     
+                        <Input size="lg" type='text' name='temperature' label="Nhiệt độ"  required/>     
+                        <Input size="lg" type="text" name='moisture' label="Độ ẩm" required/>   
                     </div>
                     <Button className="mt-6" type="submit" fullWidth style={{backgroundColor: '#3758F9'}}>
                     XÁC NHẬN

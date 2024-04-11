@@ -8,6 +8,7 @@ import { DataGrid, GridToolbarQuickFilter, GridToolbar } from '@mui/x-data-grid'
 import { Link } from 'react-router-dom';
 import { Header } from "../../components/Navbar";
 import { Sidebar } from "../../components/Sidebar";
+import { Footer } from '../../components/Footer';
 import {DialogDelete} from "./DialogDelete";
 import {DialogUpdate} from "./DialogUpdate";
 import {DialogView} from "./DialogView";
@@ -66,11 +67,12 @@ export function DashboardPage() {
     		const fetchData = async () => {
       			try {
         			const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/list`;
-				console.log ('apiURL = ', apiUrl);
+				    console.log ('apiURL = ', apiUrl);
         			// Make the HTTP GET request using Axios
         			const response = await axios.get(apiUrl);
-				let res_data = response.data; 
-				for (let i in res_data) {
+                    let res_data = response.data;
+                        console.log('Response: ', res_data);
+				    for (let i in res_data) {
 					res_data[i]['operate'] = true;
 					res_data[i]['no'] = i+1;
 					//data[i]['id'] = data[i]['_id'];		
@@ -94,13 +96,13 @@ export function DashboardPage() {
     		};
     		fetchData();
   	}, [userid]);
+
 	
 	
   const columns = React.useMemo(
     () => data.columns.filter((column) => VISIBLE_FIELDS.includes(column.field)),
     [data.columns]
   );
-
   return (
     <>
       <Header />
@@ -142,6 +144,7 @@ export function DashboardPage() {
             </Grid>
         </div>
       </div>
+      <Footer></Footer>
     </>
   );
 }
