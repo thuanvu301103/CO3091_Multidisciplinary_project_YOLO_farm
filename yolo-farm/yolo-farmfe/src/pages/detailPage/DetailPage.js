@@ -27,7 +27,11 @@ import pump_off_img from '../../assets/image/pumpoff.png';
 
 import { useParams } from "react-router-dom";
 
-
+import { TempHistory } from "../../components/TempHistory";
+import { LightHistory } from "../../components/LightHistory";
+import { MoistureHistory } from "../../components/MoistureHistory";
+import { Notification } from '../../components/Notification';
+import { Dialog } from '../../components/Dialog';
 export function DetailPage(){
     // Get params from URL
     const paramURL = useParams();
@@ -214,22 +218,15 @@ export function DetailPage(){
                             <br />
                             <span style={{ fontWeight: '700' }}>Kế hoạch</span>: {plan_name}
                         </Typography>
-
                         <div>
-                            <Link to={`/user/${userid}/area/${areaid}/history`}>
-                                <Button className="rounded-3xl mx-6" style={{ height: '40px', backgroundColor: '#0BB489', color: '#ffffff' }}>
-                                    Xem lịch sử
-                                </Button>
-                            </Link>
-                            <Link to={`/user/${userid}/area/list`}>
-                                <Button className="rounded-3xl" style={{ height: '40px', backgroundColor: '#DEE2E6', color: '#000000' }}>
+                            <Link to = {`/user/${userid}/area/list`}>
+                                <Button className="rounded-3xl" style={{height:'40px',backgroundColor:'#DEE2E6', color:'#000000'}}>
                                     Trở về
                                 </Button>
                             </Link>
                         </div>
 
                     </div>
-
                     <div className="col-span-12">
                         <Switch
                             color="green"
@@ -241,131 +238,153 @@ export function DetailPage(){
                             }}
                         />
                     </div>
-
-                    {/* Card 1: Light */}
-                    <div className="col-span-4">
-                        <Card
-                            shadow={false}
-                            className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
-                        >
-                            <CardHeader
-                                floated={false}
-                                shadow={false}
-                                color="transparent"
-                                className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
-                                style={{ background: `url(${LightImg})`, filter: 'brightness(30%)' }}
-                            >
-                                <div className="to-bg-black-10 absolute inset-0 h-full w-full " />
-
-                            </CardHeader>
-                            <CardBody className="relative py-14 px-6 md:px-12">
-                                <Typography
-                                    style={{ fontSize: '80px', color: '#C0D82B', fontWeight: 'bold' }}
-                                    className="mb-3 font-medium leading-[1.5]"
-                                >
-                                    {lightData && lightData.curent_value && `${lightData.curent_value}%`}
-                                </Typography>
-                                <Typography
-                                    variant="h3"
-                                    color="white"
-                                    className="mb-3 font-medium leading-[1.5]"
-                                >
-                                    Ánh sáng
-                                </Typography>
-                                <Typography variant="h6" className="mb-4 text-gray-400">
-                                    {lightData && lightData.low_warning && lightData.high_warning &&
-                                        `Khuyến nghị: từ ${lightData.low_warning}% đến ${lightData.high_warning}%`}
-                                </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
-                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {lightData.evaluate.toFixed(1)}%</span> : null}
-                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới {(0 - lightData.evaluate).toFixed(1)}%</span> : null}
-                                    {lightData && lightData.evaluate == 0 ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
-                                </Button>
-                            </CardBody>
-                        </Card>
+                    <div className='col-span-12 gap-6 grid grid-cols-12'>
+                        <div className='col-span-6'>
+                            <Notification></Notification>
+                        </div>
+                        <div className='col-span-6'>
+                            <Dialog></Dialog>
+                        </div>
                     </div>
-                    {/* Card 2: Temperature */}
-                    <div className="col-span-4">
-                        <Card
+                    <div className='col-span-12 gap-6 grid grid-cols-12'>
+                        <div className="col-span-4 flex items-stretch">
+                            <Card
                             shadow={false}
                             className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
-                        >
+                            >
                             <CardHeader
                                 floated={false}
                                 shadow={false}
                                 color="transparent"
                                 className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
-                                style={{ background: `url(${TempImg})`, filter: 'brightness(30%)' }}
+                                style={{background:`url(${TempImg})`, filter: 'brightness(30%)'}}
                             >
                                 <div className="to-bg-black-10 absolute inset-0 h-full w-full" />
                             </CardHeader>
                             <CardBody className="relative py-14 px-6 md:px-12">
                                 <Typography
-                                    style={{ fontSize: '80px', color: '#FCF671', fontWeight: 'bold' }}
-                                    className="mb-3 font-medium leading-[1.5]"
+                                style={{color: '#FCF671', fontWeight:'bold'}}
+                                variant='h1'
+                                className="mb-3 font-medium leading-[1.5]"
                                 >
-                                    {tempData && tempData.curent_value && `${tempData.curent_value}°C`}
+                                        {tempData && tempData.curent_value && `${tempData.curent_value}°C`}
                                 </Typography>
 
                                 <Typography
-                                    variant="h3"
-                                    color="white"
-                                    className="mb-3 font-medium leading-[1.5] w-full"
+                                variant="h5"
+                                color="white"
+                                className="mb-3 font-medium leading-[1.5] w-full"
                                 >
-                                    Nhiệt độ
+                                Nhiệt độ
                                 </Typography>
                                 <Typography variant="h6" className="mb-4 text-gray-400 w-full">
-                                    {tempData && tempData.low_warning && tempData.high_warning &&
-                                        `Khuyến nghị: từ ${tempData.low_warning}°C đến ${tempData.high_warning}°C`}
+                                        {tempData && tempData.low_warning && tempData.high_warning &&
+                                            `Khuyến nghị: từ ${tempData.low_warning}°C đến ${tempData.high_warning}°C`}
                                 </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
-                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {tempData.evaluate.toFixed(1)}%</span> : null}
-                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)}%</span> : null}
-                                    {tempData && (tempData.evaluate == 0) ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
-                                </Button>
+                                    <Button className="rounded-3xl" style={{backgroundColor: 'rgb(255,255,255)' }}>
+                                        {tempData && tempData.evaluate && tempData.evaluate > 0 ? <span style={{color:'#dc3545'}}>Cao hơn giới hạn trên {tempData.evaluate.toFixed(1)} °C</span>:null}
+                                        {tempData && tempData.evaluate && tempData.evaluate < 0 ? <span style={{color:'#dc3545'}}>Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)} °C</span>:null}
+                                        {tempData && (tempData.evaluate ==  0) ? <span style={{color:'#28a745'}}>Tình trạng tốt</span>: null}
+                                    </Button>
                             </CardBody>
-                        </Card>
+                            </Card>    
+                        </div>
+                        <div className='col-span-8'>
+                            <TempHistory></TempHistory>
+                        </div>
                     </div>
-                    {/* Card 3: Humidity */}
-                    <div className="col-span-4">
-                        <Card
+                    <div className='col-span-12 gap-6 grid grid-cols-12'>
+                        <div className="col-span-4 flex items-stretch">
+                            <Card
                             shadow={false}
                             className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
-                        >
+                            >
                             <CardHeader
                                 floated={false}
                                 shadow={false}
                                 color="transparent"
                                 className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
-                                style={{ background: `url(${MoistureImg})`, filter: 'brightness(30%)' }}
+                                style={{background:`url(${LightImg})`,  filter: 'brightness(30%)'}}
+                            >
+                                <div className="to-bg-black-10 absolute inset-0 h-full w-full " />
+                                
+                            </CardHeader>
+                            <CardBody className="relative py-14 px-6 md:px-12">
+                                <Typography
+                                style={{color: '#C0D82B', fontWeight:'bold'}}
+                                variant='h1'
+                                className="mb-3 font-medium leading-[1.5]"
+                                >
+                                        {lightData && lightData.curent_value && `${lightData.curent_value}%`}
+                                </Typography>
+                                <Typography
+                                variant="h5"
+                                color="white"
+                                className="mb-3 font-medium leading-[1.5]"
+                                >
+                                Ánh sáng
+                                </Typography>
+                                <Typography variant="h6" className="mb-4 text-gray-400">
+                                        {lightData && lightData.low_warning && lightData.high_warning &&
+                                            `Khuyến nghị: từ ${lightData.low_warning}% đến ${lightData.high_warning}%`}
+                                </Typography>
+                                <Button className="rounded-3xl" style={{backgroundColor:'rgb(255,255,255)'}}>
+                                        {lightData && lightData.evaluate && lightData.evaluate > 0 ? <span style={{color:'#dc3545'}}>Cao hơn giới hạn trên {lightData.evaluate.toFixed(1)}%</span>: null}
+                                        {lightData && lightData.evaluate && lightData.evaluate < 0 ? <span style={{color:'#dc3545'}}>Thấp hơn giới hạn dưới {(0 - lightData.evaluate).toFixed(1)}%</span>:null}
+                                        {lightData && lightData.evaluate == 0 ? <span style={{color:'#28a745'}}>Tình trạng tốt</span> : null}
+                                </Button>
+                            </CardBody>
+                            </Card>
+                        </div>
+                        <div className='col-span-8'>
+                            <LightHistory></LightHistory>
+                        </div>
+                    </div>
+                    <div className='col-span-12 gap-6 grid grid-cols-12'>
+                        <div className="col-span-4 flex items-stretch">
+                            <Card
+                            shadow={false}
+                            className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
+                            >
+                            <CardHeader
+                                floated={false}
+                                shadow={false}
+                                color="transparent"
+                                className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
+                                style={{background:`url(${MoistureImg})`, filter: 'brightness(30%)'}}
                             >
                                 <div className="to-bg-black-10 absolute inset-0 h-full w-full" />
                             </CardHeader>
                             <CardBody className="relative py-14 px-6 md:px-12">
                                 <Typography
-                                    style={{ fontSize: '80px', color: '#1152FA', fontWeight: 'bold' }}
-                                    className="mb-3 font-medium leading-[1.5]"
+                                style={{ color: '#1152FA', fontWeight:'bold'}}
+                                variant = "h1"
+                                className="mb-3 font-medium leading-[1.5]"
                                 >
-                                    {midData && midData.curent_value && `${midData.curent_value}%`}
+                                        {midData && midData.curent_value && `${midData.curent_value}%`}
                                 </Typography>
                                 <Typography
-                                    variant="h3"
-                                    color="white"
-                                    className="mb-3 font-medium leading-[1.5]"
+                                variant="h3"
+                                color="white"
+                                className="mb-3 font-medium leading-[1.5]"
                                 >
-                                    Độ ẩm
+                                Độ ẩm
                                 </Typography>
                                 <Typography variant="h6" className="mb-4 text-gray-400">
-                                    {midData && midData.low_warning && midData.high_warning &&
-                                        `Khuyến nghị: từ ${midData.low_warning}% đến ${midData.high_warning}%`}
+                                        {midData && midData.low_warning && midData.high_warning &&
+                                            `Khuyến nghị: từ ${midData.low_warning}% đến ${midData.high_warning}%`}
                                 </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
-                                    {midData && midData.evaluate && midData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {midData.evaluate.toFixed(1)}</span> : null}
-                                    {midData && midData.evaluate && midData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}</span> : null}
-                                    {midData && midData.evaluate == 0 ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
+                                <Button className="rounded-3xl" style={{backgroundColor:'rgb(255,255,255)'}}>
+                                        {midData && midData.evaluate && midData.evaluate > 0 ? <span style={{color:'#dc3545'}}>Cao hơn giới hạn trên {midData.evaluate.toFixed(1)}</span> :null}
+                                        {midData && midData.evaluate && midData.evaluate < 0 ? <span style={{color:'#dc3545'}}>Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}</span>:null}
+                                        {midData && midData.evaluate == 0 ? <span style={{color:'#28a745'}}>Tình trạng tốt</span>:null}
                                 </Button>
                             </CardBody>
-                        </Card>
+                            </Card>
+                        </div>
+                        <div className='col-span-8'>
+                            <MoistureHistory></MoistureHistory>
+                        </div>
                     </div>
 
                     {/* Card 4: Light relay */}
@@ -384,7 +403,7 @@ export function DetailPage(){
                             <CardBody className="relative py-3 px-6 md:px-12">
 
                                 {/*Ligt relay scheduler switch*/}
-                                <div>
+                                <div className='flex justify-center'>
                                     <Switch
                                         color="blue"
                                         label="Chế độ lịch biểu"
@@ -435,7 +454,7 @@ export function DetailPage(){
                             <CardBody className="relative py-3 px-6 md:px-12">
 
                                 {/*Fan Pump relay scheduler switch*/}
-                                <div>
+                                <div className='flex justify-center'>
                                     <Switch
                                         color="blue"
                                         label="Chế độ lịch biểu"
@@ -450,9 +469,9 @@ export function DetailPage(){
                                 </div>
 
                                 {/* Image */}
-                                <div className="flex justify-between items-center py-3">
-                                    <img src={fanrelayimg_state} alt="Dynamic Image" className="w-full w-full max-w-[18.5rem] h-full" />
-                                    <img src={pumprelayimg_state} alt="Dynamic Image" className="w-full w-full max-w-[18.5rem] h-full" />
+                                <div className="flex items-center py-3 justify-evenly">
+                                    <img src={fanrelayimg_state} alt="Dynamic Image" className=" w-full max-w-[15.5rem] h-full" />
+                                    <img src={pumprelayimg_state} alt="Dynamic Image" className=" w-full max-w-[15.5rem] h-full" />
                                 </div>
 
                                 {/*Fan Pump relay switch*/}
