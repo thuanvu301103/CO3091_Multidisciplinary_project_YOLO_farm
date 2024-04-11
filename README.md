@@ -211,6 +211,18 @@ Both dynamic route parameters and query parameters are fully compatible with the
         @Param('areaid') areaid: string
     ) {/*..*/.}
   ```
+#### API for getting automatic mode/ light relay/ pump/ fan state
+- Get sutomatic mode button state:
+   + url ```user/{user_id}/plantarea/{area_id}/automatic```
+   + Successful response: 1 for turning on and 0 for turning off
+- Get light relay state:
+   + url ```user/{user_id}/plantarea/{area_id}/light/state```
+   + Successful response: 1 for turning on and 0 for turning off
+- Get fan and pump state:
+   + url ```user/{user_id}/plantarea/{area_id}/fanpump/state```
+   + Successful response: 1 for turning on and 0 for turning off
+
+
 #### API for usecase 1: Supervise the plant area
 * Caution: because, be server is run on localhost, sô the url must start with: ```http://127.0.0.1:3000```
 - Get list of plant areas of specific user
@@ -431,7 +443,11 @@ export default App;
     		);
 ```
 
-### Sitemap
-- ```http://192.168.56.1:3001/user/{userid}/area/list```: list of plant area of a user with specific userid
-- ```http://192.168.56.1:3001/user/{userid}/area/{areaid}```: detail of plant area of a user with specific userid and areaid
-- ```http://192.168.56.1:3001/user/{userid}/area/{areaid}/history```: history of plant area of a user with specific userid and areaid
+### Sitemap:
+- ```http://localhost:3001/user/{userid}/area/list```: list of plant area of a user with specific userid
+- ```http://localhost:3001/user/{userid}/area/{areaid}```: detail of plant area of a user with specific userid and areaid
+- ```http://localhost:3001/user/{userid}/area/{areaid}/history```: history of plant area of a user with specific userid and areaid
+
+
+userid = 65f0529c5933e074166715a5
+areaid = 65f0529c5933e074166715a8

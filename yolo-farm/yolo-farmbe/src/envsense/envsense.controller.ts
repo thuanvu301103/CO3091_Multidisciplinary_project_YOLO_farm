@@ -92,15 +92,39 @@ export class EnvsenseController {
         return result;
     }
 
+    // Get automatic mode state
     @Get('user/:userid/plantarea/:areaid/automatic')
     async getCurrAutomaticMode(
         @Param('userid') userid: string,
         @Param('areaid') areaid: string
     ) {
         let result = await this.envsenseService.getCurrAutomaticMode(userid, areaid);
-        console.log('Automatic mode JSON: ', result);
+        //console.log('Automatic mode JSON: ', result);
         return result;
     }
+
+    // Get light relay state
+    @Get('user/:userid/plantarea/:areaid/light/state')
+    async getCurrLightState(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string
+    ) {
+        let result = await this.envsenseService.getCurrLightState(userid, areaid);
+        //console.log('Automatic mode JSON: ', result);
+        return result;
+    }
+
+    // Get fan + pump state
+    @Get('user/:userid/plantarea/:areaid/fanpump/state')
+    async getCurrFanPumpState(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string
+    ) {
+        let result = await this.envsenseService.getCurrFanPumpState(userid, areaid);
+        //console.log('Automatic mode JSON: ', result);
+        return result;
+    }
+
 
 
     /*
@@ -130,5 +154,19 @@ export class EnvsenseController {
         if (await result == "400") res.status(400).send("Bad Request");
         else if (await result == "200") res.status(200).send("OK");
         else if (await result == "500") res.status(500).send("Internal Server Error");
+    }
+
+
+    @Get('user/:userid/plantarea/:areaid/fanpump/turnon/:turnon')
+    async turnOnFanPump(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string,
+        @Param('turnon') turnon: number,
+        @Res() res
+    ) {
+        //console.log("Working...");
+        let result = await this.envsenseService.turnOnFanPump(userid, areaid, turnon);
+        if (result) res.status(200).send('OK');
+        else res.status(403).send('Forbidden: manual mode is off');
     }
 }

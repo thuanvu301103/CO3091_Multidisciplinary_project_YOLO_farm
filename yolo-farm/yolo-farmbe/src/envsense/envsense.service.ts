@@ -314,6 +314,40 @@ export class EnvsenseService {
         }
     }
 
+    // Get curent Light State
+    public async getCurrLightState(userid: string, areaid: string) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            // send upadate message
+            const response = await axios.get(`https://io.adafruit.com/api/v2/${area.ma_feed_nutnhan_den}/data?limit=1`);
+            // console.log(response.data); // Handle response data here
+            let result = response.data[0].value;
+            console.log('LightRelay state: ', result);
+            return result;
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return 0;
+            // Handle error here
+        }
+    }
+
+    // Get curent Light State
+    public async getCurrFanPumpState(userid: string, areaid: string) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            // send upadate message
+            const response = await axios.get(`https://io.adafruit.com/api/v2/${area.ma_feed_nutnhan_maybom}/data?limit=1`);
+            // console.log(response.data); // Handle response data here
+            let result = response.data[0].value;
+            console.log('Fan + Pump state: ', result);
+            return result;
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return 0;
+            // Handle error here
+        }
+    }
+
     /**Light sensor module
      */
 
@@ -370,5 +404,30 @@ export class EnvsenseService {
         }
     }
 
+    /**Temp + Humid sensor module
+     */
 
+    // Turn on or of fanpump
+    public async turnOnFanPump(userid: string, areaid: string, turnon: number) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            //console.log(area.che_do_anh_sang);
+            if (area.che_do_nhiet_am != "thu cong") return false;
+
+            // send upadate message
+            const response = await axios.post(`https://io.adafruit.com/api/v2/${area.ma_feed_nutnhan_maybom}/data`, {
+                value: turnon
+            }, {
+                headers: {
+                    'X-AIO-Key': adafenv.activekey
+                }
+            });
+            console.log(response.data); // Handle response data here
+            return true;
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return false;
+            // Handle error here
+        }
+    }
 }
