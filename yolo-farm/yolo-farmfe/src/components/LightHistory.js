@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import {
-    Card,
-    CardBody,
-    CardHeader,
-    Typography,
+  Card,
+  CardBody,
+  CardHeader,
+  Typography,
 } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
 import { useParams } from "react-router-dom";
-import MoistureIcon from "../../assets/image/moisture_icon.png"
-import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+
+ 
 // If you're using Next.js please use the dynamic import for react-apexcharts and remove the import from the top for the react-apexcharts
 // import dynamic from "next/dynamic";
 // const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -39,7 +39,7 @@ let chartConfig = {
         dataLabels: {
             enabled: false,
         },
-        colors: ["#2986cc"],
+        colors: ["#FCF671"],
         stroke: {
             lineCap: "round",
             curve: "smooth",
@@ -97,14 +97,14 @@ let chartConfig = {
         },
     },
 };
-
-export function MoistureHistory() {
+ 
+export function LightHistory() {
 
     // Get params from URL
     const paramURL = useParams();
     let userid = paramURL['userid'];
     let areaid = paramURL['areaid'];
-    const [moistureData, setMoistureData] = useState(null);
+    const [lightData, setLightData] = useState(null);
     const [chartData, setChartData] = useState(null);
 
 
@@ -116,7 +116,7 @@ export function MoistureHistory() {
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
                 let res_data = response.data;
-                setMoistureData(res_data['do_am']);
+                setLightData(res_data['anh_sang']);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -130,7 +130,7 @@ export function MoistureHistory() {
                 const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/history?filter=year`;
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
-                let res_data = response.data['do_am_chart_data'];
+                let res_data = response.data['anh_sang_chart_data'];
                 //console.log(res_data);
                 chartConfig['series'][0]['data'] = [];
                 chartConfig['options']['xaxis']['categories'] = [];
@@ -148,59 +148,48 @@ export function MoistureHistory() {
     }, []);
 
     console.log(chartData);
+    
 
-
-    return (
-        <Card className='my-5'>
-            <CardHeader
-                floated={false}
-                shadow={false}
-                color="transparent"
-                className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
-            >
-                <div className="w-max rounded-lg p-5">
-                    {/* <img src={MoistureIcon}></img> */}
-                    <WaterDropOutlinedIcon></WaterDropOutlinedIcon>
-                </div>
-                <div className="flex col-span-12 justify-between w-full">
-                    <div className="w-fit">
-                        <Typography variant="h6" color="blue-gray">
-                            Độ ẩm
-                        </Typography>
-                        <Typography
-                            variant="small"
-                            color="gray"
-                            className="max-w-sm font-normal"
-                        >
-                            {moistureData && moistureData.low_warning && moistureData.high_warning &&
-                                `Độ ẩm khuyến nghị: từ ${moistureData.low_warning} đến ${moistureData.high_warning}`}
-                        </Typography>
-                    </div>
-                    <div className="flex items-center">
-                        <Typography variant="h6" color="blue-gray">
-                            Ngày
-                        </Typography>
-                        <input type="date" className="px-2"></input>
-                    </div>
-                    <div className="flex items-center">
-                        <Typography variant="h6" color="blue-gray">
-                            Từ
-                        </Typography>
-                        <input type="time" className="px-2"></input>
-                    </div>
-                    <div className="flex items-center">
-                        <Typography variant="h6" color="blue-gray">
-                            Đến
-                        </Typography>
-                        <input type="time" className="px-2"></input>
-                    </div>
-                </div>
-            </CardHeader>
-            <CardBody className="px-2 pb-0">
-                {chartData && (
-                    <Chart {...chartData} />
-                )}
-            </CardBody>
-        </Card>
-    );
+  return (
+    <Card>
+      <CardHeader
+        floated={false}
+        shadow={false}
+        color="transparent"
+        className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+      >
+        <div className="w-max rounded-lg p-5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+            </svg>
+        </div>
+        <div className="flex col-span-12 justify-between w-full">
+            <div className="w-fit">
+                <Typography variant="h6" color="blue-gray">
+                    Ánh sáng
+                </Typography>
+                <Typography
+                    variant="small"
+                    color="gray"
+                    className="max-w-sm font-normal"
+                >
+                          {lightData && lightData.low_warning && lightData.high_warning &&
+                              `Ánh sáng khuyến nghị: từ ${lightData.low_warning} đến ${lightData.high_warning}`}
+                </Typography>
+            </div>
+            <div className="flex items-center">
+                <Typography variant="h6" color="blue-gray">
+                    Ngày
+                </Typography>
+                <input type="date" className="px-2"></input>
+            </div>
+        </div>
+      </CardHeader>
+          <CardBody className="px-2 pb-0">
+              {chartData && (
+                  <Chart {...chartData} />
+              )}
+          </CardBody>
+    </Card>
+  );
 }

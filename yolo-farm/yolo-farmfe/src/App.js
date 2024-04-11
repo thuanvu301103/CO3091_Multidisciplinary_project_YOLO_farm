@@ -3,7 +3,6 @@ import axios from "axios";
 import logo from './logo.svg';
 import './App.css';
 import { DetailPage } from './pages/detailPage/DetailPage'
-import { HistoryPage } from "./pages/historyPage/HistoryPage";
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
 import {
@@ -36,10 +35,7 @@ function App() {
         <Route path='/user/:userid/area/list' element={<DashboardPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
-        <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
       </Routes>
-      {/* <DetailPage></DetailPage> */}
-      {/* <HistoryPage></HistoryPage> */}
     </Router>
   );
 }

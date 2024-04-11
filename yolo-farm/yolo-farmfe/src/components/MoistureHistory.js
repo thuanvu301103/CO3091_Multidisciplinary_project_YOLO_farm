@@ -8,8 +8,8 @@ import {
 } from "@material-tailwind/react";
 import Chart from "react-apexcharts";
 import { useParams } from "react-router-dom";
-
-
+import MoistureIcon from "../assets/image/moisture_icon.png"
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
 // If you're using Next.js please use the dynamic import for react-apexcharts and remove the import from the top for the react-apexcharts
 // import dynamic from "next/dynamic";
 // const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -39,7 +39,7 @@ let chartConfig = {
         dataLabels: {
             enabled: false,
         },
-        colors: ["#cc0000"],
+        colors: ["#2986cc"],
         stroke: {
             lineCap: "round",
             curve: "smooth",
@@ -98,13 +98,13 @@ let chartConfig = {
     },
 };
 
-export function TempHistory() {
+export function MoistureHistory() {
 
     // Get params from URL
     const paramURL = useParams();
     let userid = paramURL['userid'];
     let areaid = paramURL['areaid'];
-    const [tempData, setTempData] = useState(null);
+    const [moistureData, setMoistureData] = useState(null);
     const [chartData, setChartData] = useState(null);
 
 
@@ -116,7 +116,7 @@ export function TempHistory() {
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
                 let res_data = response.data;
-                setTempData(res_data['nhiet_do']);
+                setMoistureData(res_data['do_am']);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -130,7 +130,7 @@ export function TempHistory() {
                 const apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/history?filter=year`;
                 // Make the HTTP GET request using Axios
                 const response = await axios.get(apiUrl);
-                let res_data = response.data['nhiet_do_chart_data'];
+                let res_data = response.data['do_am_chart_data'];
                 //console.log(res_data);
                 chartConfig['series'][0]['data'] = [];
                 chartConfig['options']['xaxis']['categories'] = [];
@@ -151,7 +151,7 @@ export function TempHistory() {
 
 
     return (
-        <Card className='my-5'>
+        <Card>
             <CardHeader
                 floated={false}
                 shadow={false}
@@ -159,23 +159,21 @@ export function TempHistory() {
                 className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
             >
                 <div className="w-max rounded-lg p-5">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
-                    </svg>
+                    {/* <img src={MoistureIcon}></img> */}
+                    <WaterDropOutlinedIcon></WaterDropOutlinedIcon>
                 </div>
                 <div className="flex col-span-12 justify-between w-full">
                     <div className="w-fit">
                         <Typography variant="h6" color="blue-gray">
-                            Nhiệt độ
+                            Độ ẩm
                         </Typography>
                         <Typography
                             variant="small"
                             color="gray"
                             className="max-w-sm font-normal"
                         >
-                            {tempData && tempData.low_warning && tempData.high_warning &&
-                                `Nhiệt độ khuyến nghị: từ ${tempData.low_warning} đến ${tempData.high_warning}`}
+                            {moistureData && moistureData.low_warning && moistureData.high_warning &&
+                                `Độ ẩm khuyến nghị: từ ${moistureData.low_warning} đến ${moistureData.high_warning}`}
                         </Typography>
                     </div>
                     <div className="flex items-center">
@@ -183,18 +181,6 @@ export function TempHistory() {
                             Ngày
                         </Typography>
                         <input type="date" className="px-2"></input>
-                    </div>
-                    <div className="flex items-center">
-                        <Typography variant="h6" color="blue-gray">
-                            Từ
-                        </Typography>
-                        <input type="time" className="px-2"></input>
-                    </div>
-                    <div className="flex items-center">
-                        <Typography variant="h6" color="blue-gray">
-                            Đến
-                        </Typography>
-                        <input type="time" className="px-2"></input>
                     </div>
                 </div>
             </CardHeader>

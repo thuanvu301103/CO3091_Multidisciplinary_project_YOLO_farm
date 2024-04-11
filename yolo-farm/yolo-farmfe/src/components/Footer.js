@@ -7,7 +7,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 export function Footer() {
   return (
-    <div className="flex flex-col pt-10 pr-10 pb-20 pl-20 bg-white max-md:px-5">
+    <div className="flex flex-col pt-10 pr-10 pb-20 pl-20 bg-white max-md:px-5 border-t-2 border-blue-gray-900/5">
       <div className="shrink-0 self-end rounded-full bg-[linear-gradient(180deg,rgba(19,194,150,0.31)_0%,rgba(196,196,196,0.00)_100%)] h-[75px] w-[75px]" />
       <div className="self-center mt-1.5 w-full max-w-[1265px] max-md:max-w-full">
         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
