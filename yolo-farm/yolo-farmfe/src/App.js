@@ -43,6 +43,9 @@ function App() {
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
         <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
+        <Route path='/user/:userid/area/:areaid/tempschedule' element={<TempSchedulePage/>}/>
+        <Route path='/user/:userid/area/:areaid/midschedule' element={<MidSchedulePage/>}/>
+
         {/*Manager Routes*/}
         <Route path='/manager/:managerid/area/list' element={<DashboardPageManager/>}/>
         <Route path='/manager/:managerid/area/:areaid' element={<DetailPageManager/>}/>

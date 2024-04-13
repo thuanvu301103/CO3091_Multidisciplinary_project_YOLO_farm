@@ -286,86 +286,90 @@ export function DetailPage(){
                     </div>
                     {/* Card 2: Temperature */}
                     <div className="col-span-4">
-                        <Card
-                            shadow={false}
-                            className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
-                        >
-                            <CardHeader
-                                floated={false}
+                        <Link to = {`/user/${userid}/area/${areaid}/tempschedule`}>
+                            <Card
                                 shadow={false}
-                                color="transparent"
-                                className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
-                                style={{ background: `url(${TempImg})`, filter: 'brightness(30%)' }}
+                                className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
                             >
-                                <div className="to-bg-black-10 absolute inset-0 h-full w-full" />
-                            </CardHeader>
-                            <CardBody className="relative py-14 px-6 md:px-12">
-                                <Typography
-                                    style={{ fontSize: '80px', color: '#FCF671', fontWeight: 'bold' }}
-                                    className="mb-3 font-medium leading-[1.5]"
+                                <CardHeader
+                                    floated={false}
+                                    shadow={false}
+                                    color="transparent"
+                                    className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
+                                    style={{ background: `url(${TempImg})`, filter: 'brightness(30%)' }}
                                 >
-                                    {tempData && tempData.curent_value && `${tempData.curent_value}°C`}
-                                </Typography>
+                                    <div className="to-bg-black-10 absolute inset-0 h-full w-full" />
+                                </CardHeader>
+                                <CardBody className="relative py-14 px-6 md:px-12">
+                                    <Typography
+                                        style={{ fontSize: '80px', color: '#FCF671', fontWeight: 'bold' }}
+                                        className="mb-3 font-medium leading-[1.5]"
+                                    >
+                                        {tempData && tempData.curent_value && `${tempData.curent_value}°C`}
+                                    </Typography>
 
-                                <Typography
-                                    variant="h3"
-                                    color="white"
-                                    className="mb-3 font-medium leading-[1.5] w-full"
-                                >
-                                    Nhiệt độ
-                                </Typography>
-                                <Typography variant="h6" className="mb-4 text-gray-400 w-full">
-                                    {tempData && tempData.low_warning && tempData.high_warning &&
-                                        `Khuyến nghị: từ ${tempData.low_warning}°C đến ${tempData.high_warning}°C`}
-                                </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
-                                    {tempData && tempData.evaluate && tempData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {tempData.evaluate.toFixed(1)}%</span> : null}
-                                    {tempData && tempData.evaluate && tempData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)}%</span> : null}
-                                    {tempData && (tempData.evaluate == 0) ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
-                                </Button>
-                            </CardBody>
-                        </Card>
+                                    <Typography
+                                        variant="h3"
+                                        color="white"
+                                        className="mb-3 font-medium leading-[1.5] w-full"
+                                    >
+                                        Nhiệt độ
+                                    </Typography>
+                                    <Typography variant="h6" className="mb-4 text-gray-400 w-full">
+                                        {tempData && tempData.low_warning && tempData.high_warning &&
+                                            `Khuyến nghị: từ ${tempData.low_warning}°C đến ${tempData.high_warning}°C`}
+                                    </Typography>
+                                    <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
+                                        {tempData && tempData.evaluate && tempData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {tempData.evaluate.toFixed(1)}%</span> : null}
+                                        {tempData && tempData.evaluate && tempData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới ${(0 - tempData.evaluate).toFixed(1)}%</span> : null}
+                                        {tempData && (tempData.evaluate == 0) ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
+                                    </Button>
+                                </CardBody>
+                            </Card>
+                        </Link>
                     </div>
                     {/* Card 3: Humidity */}
                     <div className="col-span-4">
-                        <Card
-                            shadow={false}
-                            className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
-                        >
-                            <CardHeader
-                                floated={false}
+                        <Link to = {`/user/${userid}/area/${areaid}/midschedule`}>
+                            <Card
                                 shadow={false}
-                                color="transparent"
-                                className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
-                                style={{ background: `url(${MoistureImg})`, filter: 'brightness(30%)' }}
+                                className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
                             >
-                                <div className="to-bg-black-10 absolute inset-0 h-full w-full" />
-                            </CardHeader>
-                            <CardBody className="relative py-14 px-6 md:px-12">
-                                <Typography
-                                    style={{ fontSize: '80px', color: '#1152FA', fontWeight: 'bold' }}
-                                    className="mb-3 font-medium leading-[1.5]"
+                                <CardHeader
+                                    floated={false}
+                                    shadow={false}
+                                    color="transparent"
+                                    className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
+                                    style={{ background: `url(${MoistureImg})`, filter: 'brightness(30%)' }}
                                 >
-                                    {midData && midData.curent_value && `${midData.curent_value}%`}
-                                </Typography>
-                                <Typography
-                                    variant="h3"
-                                    color="white"
-                                    className="mb-3 font-medium leading-[1.5]"
-                                >
-                                    Độ ẩm
-                                </Typography>
-                                <Typography variant="h6" className="mb-4 text-gray-400">
-                                    {midData && midData.low_warning && midData.high_warning &&
-                                        `Khuyến nghị: từ ${midData.low_warning}% đến ${midData.high_warning}%`}
-                                </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
-                                    {midData && midData.evaluate && midData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {midData.evaluate.toFixed(1)}</span> : null}
-                                    {midData && midData.evaluate && midData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}</span> : null}
-                                    {midData && midData.evaluate == 0 ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
-                                </Button>
-                            </CardBody>
-                        </Card>
+                                    <div className="to-bg-black-10 absolute inset-0 h-full w-full" />
+                                </CardHeader>
+                                <CardBody className="relative py-14 px-6 md:px-12">
+                                    <Typography
+                                        style={{ fontSize: '80px', color: '#1152FA', fontWeight: 'bold' }}
+                                        className="mb-3 font-medium leading-[1.5]"
+                                    >
+                                        {midData && midData.curent_value && `${midData.curent_value}%`}
+                                    </Typography>
+                                    <Typography
+                                        variant="h3"
+                                        color="white"
+                                        className="mb-3 font-medium leading-[1.5]"
+                                    >
+                                        Độ ẩm
+                                    </Typography>
+                                    <Typography variant="h6" className="mb-4 text-gray-400">
+                                        {midData && midData.low_warning && midData.high_warning &&
+                                            `Khuyến nghị: từ ${midData.low_warning}% đến ${midData.high_warning}%`}
+                                    </Typography>
+                                    <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
+                                        {midData && midData.evaluate && midData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {midData.evaluate.toFixed(1)}</span> : null}
+                                        {midData && midData.evaluate && midData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới ${(0 - midData.evaluate).toFixed(1)}</span> : null}
+                                        {midData && midData.evaluate == 0 ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
+                                    </Button>
+                                </CardBody>
+                            </Card>
+                        </Link>
                     </div>
 
                     {/* Card 4: Light relay */}
