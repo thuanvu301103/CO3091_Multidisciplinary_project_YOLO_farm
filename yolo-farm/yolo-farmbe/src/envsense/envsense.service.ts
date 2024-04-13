@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import * as mqtt from 'mqtt';
 import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
-import * as adafenv from '../config/config.adafruitenv'
+import * as adafenv from '../config/config.adafruit'
 // Database Shemas
 import { Nguoi_dung } from '../schemas/nguoi_dung.schema';
 import { Khu_cay_trong } from '../schemas/khu_cay_trong.schema';
@@ -136,6 +136,9 @@ export class EnvsenseService {
                 feed_name = "ma_feed_do_am";
             } else if (area.ma_feed_nutnhan_den == topic) {
                 feed_name = "ma_feed_nutnhan_den";
+                return { "feed_name": feed_name, "evaluate": 0 };
+            } else if (area.ma_feed_nutnhan_maybom == topic) {
+                feed_name = "ma_feed_nutnhan_maybom";
                 return { "feed_name": feed_name, "evaluate": 0 };
             } else if (area.ma_feed_automatic == topic) {
                 feed_name = "ma_feed_automatic";
@@ -428,6 +431,19 @@ export class EnvsenseService {
             console.error('Error sending data to Adafruit:', error);
             return false;
             // Handle error here
+        }
+    }
+
+    // Update Light button's change
+    public async updateFanPumpButtonChange(feed_name: string, feed_type: string, curr_val: number) {
+        let area = await this.Khu_cay_trongModel.findOne({ ma_feed_nutnhan_maybom: feed_name }).exec();
+        let user_id = area.nguoi_dung_id;
+
+        return {
+            id: area._id,
+            nguoi_dung_id: user_id,
+            feed_type: feed_type,
+            curent_value: curr_val
         }
     }
 }

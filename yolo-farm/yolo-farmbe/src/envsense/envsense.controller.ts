@@ -22,7 +22,8 @@ export class EnvsenseController {
             // Handle the message as needed
             let res_data = null;
             if (detail.feed_name == 'ma_feed_automatic') return;
-            if (detail.feed_name == 'ma_feed_nutnhan_den') res_data = JSON.stringify(await this.envsenseService.updateLightButtonChange(topic, detail.feed_name, message - 0));
+            else if (detail.feed_name == 'ma_feed_nutnhan_den') res_data = JSON.stringify(await this.envsenseService.updateLightButtonChange(topic, detail.feed_name, message - 0));
+            else if (detail.feed_name == 'ma_feed_nutnhan_maybom') res_data = JSON.stringify(await this.envsenseService.updateFanPumpButtonChange(topic, detail.feed_name, message - 0));
             else res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
 			console.log('Sent data: ', res_data);
             res.write("data:" + res_data + "\n\n");

@@ -178,7 +178,12 @@ export function DetailPage(){
                         setTempData(eventData);
                     } else if (eventData['feed_type'] === 'ma_feed_do_am') {
                         setMidData(eventData);
-                    } 
+                    } else if (eventData['feed_type'] === 'ma_feed_nutnhan_den') {
+                        setLightRelayState(eventData['curent_value']);
+                    } else if (eventData['feed_type'] === 'ma_feed_nutnhan_maybom') {
+                        setFanPumpRelayState(eventData['curent_value']);
+                        console.log("Fan + Pump Relay State: ", eventData['curent_value'])
+                    }
                     // Handle the received event data
                 };
 
@@ -198,7 +203,7 @@ export function DetailPage(){
         fetchData();
     }, []);
 
-    console.log('Automatic mode: ', automatic_state);
+    //console.log('Automatic mode: ', automatic_state);
  
     return (
         <>
