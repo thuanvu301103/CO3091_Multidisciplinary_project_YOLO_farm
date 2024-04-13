@@ -5,8 +5,12 @@ import './App.css';
 import { DetailPage } from './pages/detailPage/DetailPage'
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
+import { HistoryPage } from "./pages/historyPage/HistoryPage";
 import {TempSchedulePage} from './pages/schedulePage/tempSchedulePage/TempSchedulePage';
 import { MidSchedulePage } from "./pages/schedulePage/midSchedulePage/MidSchedulePage";
+
+import {DashboardPageManager } from "./pages/dashboardPageManager/DashboardPageManager";
+import { DetailPageManager } from "./pages/detailPageManager/DetailPageManager";
 import {
   BrowserRouter as Router,
   Switch,
@@ -34,9 +38,17 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/*User Routes*/}
         <Route path='/user/:userid/area/list' element={<DashboardPage/>}/>
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
+        <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
+        <Route path='/user/:userid/area/:areaid/tempschedule' element={<TempSchedulePage/>}/>
+        <Route path='/user/:userid/area/:areaid/midschedule' element={<MidSchedulePage/>}/>
+
+        {/*Manager Routes*/}
+        <Route path='/manager/:managerid/area/list' element={<DashboardPageManager/>}/>
+        <Route path='/manager/:managerid/area/:areaid' element={<DetailPageManager/>}/>
       </Routes>
     </Router>
   );

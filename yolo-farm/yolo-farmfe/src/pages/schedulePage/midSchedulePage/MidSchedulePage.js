@@ -167,7 +167,7 @@ export function MidSchedulePage() {
               THIẾT LẬP LỊCH BẬT TẮT QUẠT, MÁY BƠM
             </Typography>
             <div>
-              <Link to="/user/:userid/area/:areaid">
+              <Link to={`/user/${userid}/area/${areaid}`}>
                 <Button className="rounded-3xl" style={{ height: '40px', backgroundColor: '#DEE2E6', color: '#000000' }}>
                   Trở về
                 </Button>
