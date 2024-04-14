@@ -39,10 +39,10 @@ export function DetailPage(){
     const [area_name, setAreaName] = useState(null);
     const [plan_name, setPlanName] = useState(null);
     const [automatic_state, setAutomaticState] = useState(null);
-    const [lightschedule_state, setLightScheduleState] = useState(null);
+    const [lightschedule_state, setLightScheduleState] = useState(false);
     const [lightrelay_state, setLightRelayState] = useState(null);
     const [lightrelayimg_state, setLightRelayImgState] = useState(light_off_img);
-    const [fanpumpschedule_state, setFanPumpScheduleState] = useState(null);
+    const [fanpumpschedule_state, setFanPumpScheduleState] = useState(false);
     const [fanpumprelay_state, setFanPumpRelayState] = useState(null);
     const [fanrelayimg_state, setFanRelayImgState] = useState(fan_off_img);
     const [pumprelayimg_state, setPumpRelayImgState] = useState(pump_off_img);
@@ -51,8 +51,9 @@ export function DetailPage(){
     const [initial, setInitial] = useState(true);   // for automatic switch
     const [lightinit, setLightInit] = useState(true);   // for light switch
     const [fanpumpinit, setFanPumpInit] = useState(true);   // for fan pump switch
+    const [light_modeinit, setLightModeInit] = useState(true);   // for light switch
+    const [fanpump_modeinit, setFanPumpModeInit] = useState(true);   // for fan pump switch
 
-    // fetch automatic/light/fan/pump state data
     // fetch automatic/light/fan/pump state data
     useEffect(() => {
         const fetchData = async () => {
@@ -80,7 +81,19 @@ export function DetailPage(){
                 if (res_data == '1') setFanPumpRelayState(true);
                 else setFanPumpRelayState(false);
 
+                // fetch light mode
+                apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/light/getmode`;
+                response = await axios.get(apiUrl);
+                res_data = response.data;
+                //console.log("Light Mode: ", res_data);
+                if (res_data == 'theo lich') setLightScheduleState(true);
 
+                // fetch fan + pump mode
+                apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/fanpump/getmode`;
+                response = await axios.get(apiUrl);
+                res_data = response.data;
+                if (res_data == 'theo lich') setFanPumpScheduleState(true);
+                
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -103,6 +116,38 @@ export function DetailPage(){
         fetchData();
         // You can perform any other actions based on the updated state here
     }, [automatic_state]); // Specify automaticState as a dependency
+
+    // Handle Light Mode Switch Change
+    useEffect(() => {
+
+        const fetchData = async () => {
+            // This function will be called whenever automaticState changes
+            let mode = 'thu cong';
+            if (lightschedule_state == true) mode = 'theo lich';
+            let apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/light/mode/${mode}`;
+            const response = await axios.get(apiUrl);
+        };
+        // If the change is due to initial of automatic button then do nothing
+        if (light_modeinit == true) return;
+        fetchData();
+        // You can perform any other actions based on the updated state here
+    }, [lightschedule_state]);
+
+    // Handle Fan Pump Mode Switch Change
+    useEffect(() => {
+
+        const fetchData = async () => {
+            // This function will be called whenever automaticState changes
+            let mode = 'thu cong';
+            if (fanpumpschedule_state == true) mode = 'theo lich';
+            let apiUrl = `http://localhost:3000/envsense/user/${userid}/plantarea/${areaid}/fanpump/mode/${mode}`;
+            const response = await axios.get(apiUrl);
+        };
+        // If the change is due to initial of automatic button then do nothing
+        if (fanpump_modeinit == true) return;
+        fetchData();
+        // You can perform any other actions based on the updated state here
+    }, [fanpumpschedule_state]);
 
     // Fetch data for the first time enter detail page
     useEffect(() => {
@@ -163,10 +208,10 @@ export function DetailPage(){
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const eventSource = new EventSource('http://127.0.0.1:3000/envsense'); // Create a connection to be-server then maintain it in time
-
+                const eventSourceD = new EventSource(`http://127.0.0.1:3000/envsense/user/${userid}/streamevent`); // Create a connection to be-server then maintain it in time
+         
                 // Change value when changes occurred
-                eventSource.onmessage = (event) => {
+                eventSourceD.onmessage = (event) => {
                     const eventData = JSON.parse(event.data);
                     console.log('Received event:', eventData);
                     if (eventData['feed_type'] === 'ma_feed_anh_sang') {
@@ -184,13 +229,13 @@ export function DetailPage(){
                     // Handle the received event data
                 };
 
-                eventSource.onerror = (error) => {
+                eventSourceD.onerror = (error) => {
                     console.error('SSE connection error:', error);
                     // Handle SSE connection error
                 };
 
                 return () => {
-                    eventSource.close();    // Close connection
+                    eventSourceD.close();    // Close connection
                 };
 
             } catch (error) {
@@ -402,6 +447,7 @@ export function DetailPage(){
                                         disabled={automatic_state}
                                         checked={lightschedule_state}
                                         onChange={() => {
+                                            setLightModeInit(false);
                                             setLightScheduleState(!lightschedule_state);
                                         }}
                                     />
@@ -453,7 +499,7 @@ export function DetailPage(){
                                         disabled={automatic_state}
                                         checked={fanpumpschedule_state}
                                         onChange={() => {
-                                            //setLightInit(false);
+                                            setFanPumpModeInit(false);
                                             setFanPumpScheduleState(!fanpumpschedule_state);
                                         }}
                                     />

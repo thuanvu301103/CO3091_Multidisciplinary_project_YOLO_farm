@@ -6,28 +6,33 @@ export class EnvsenseController {
 
     constructor(private readonly envsenseService: EnvsenseService) { }
 
-    @Get()
-    async streamEvent(@Res() res) {
-	// Set up HTTP header for stream Event
-	res.setHeader('Content-Type', 'text/event-stream');
+    @Get('user/:userid/streamevent')
+    async streamEvent(
+        @Param('userid') userid: string,
+        @Res() res
+    ) {
+	    // Set up HTTP header for stream Event
+	    res.setHeader('Content-Type', 'text/event-stream');
     	res.setHeader('Cache-Control', 'no-cache');
     	res.flushHeaders();
 	
-	// Sent message when changes occurred	
-	this.envsenseService.mqtt_client.on('message', async (topic, message) => {
+	    // Sent message when changes occurred	
+	    this.envsenseService.mqtt_client.on('message', async (topic, message) => {
 
-        let detail = await this.envsenseService.evaluateVal(topic, message);
-        console.log(detail);
-            console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
+            let detail = await this.envsenseService.evaluateVal(topic, message);
+            //console.log(detail);
+            //console.log(`Received message on topic ${topic} - feed ${detail.feed_name} - evaluation ${detail.evaluate}: ${message.toString()}`);
             // Handle the message as needed
             let res_data = null;
             if (detail.feed_name == 'ma_feed_automatic') return;
-            else if (detail.feed_name == 'ma_feed_nutnhan_den') res_data = JSON.stringify(await this.envsenseService.updateLightButtonChange(topic, detail.feed_name, message - 0));
-            else if (detail.feed_name == 'ma_feed_nutnhan_maybom') res_data = JSON.stringify(await this.envsenseService.updateFanPumpButtonChange(topic, detail.feed_name, message - 0));
-            else res_data = JSON.stringify(await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate));
-			console.log('Sent data: ', res_data);
-            res.write("data:" + res_data + "\n\n");
-
+            else if (detail.feed_name == 'ma_feed_nutnhan_den') res_data = await this.envsenseService.updateLightButtonChange(topic, detail.feed_name, message - 0);
+            else if (detail.feed_name == 'ma_feed_nutnhan_maybom') res_data = await this.envsenseService.updateFanPumpButtonChange(topic, detail.feed_name, message - 0);
+            else res_data = await this.envsenseService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate);
+            //console.log('Sent data: ', res_data['nguoi_dung_id']);
+            //console.log('Sent data: ', userid);
+            if (res_data['nguoi_dung_id'] == userid) {
+                res.write("data:" + JSON.stringify(res_data) + "\n\n");
+            }
         });
     }
     
@@ -93,6 +98,10 @@ export class EnvsenseController {
         return result;
     }
 
+    /**
+     * Get Current Button State
+     */
+
     // Get automatic mode state
     @Get('user/:userid/plantarea/:areaid/automatic')
     async getCurrAutomaticMode(
@@ -126,7 +135,60 @@ export class EnvsenseController {
         return result;
     }
 
+    /**
+    * Get Current Mode
+    */
 
+    // Get Curent Light Mode
+    @Get('user/:userid/plantarea/:areaid/light/getmode')
+    async getLightMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string
+    ) {
+        let result = await this.envsenseService.getLightMode(userid, areaid);
+        //console.log("Light Mode Result: ", result);
+        return result;
+    }
+
+    // Get Curent Fan + Pump Mode
+    @Get('user/:userid/plantarea/:areaid/fanpump/getmode')
+    async getFanPumpMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string
+    ) {
+        let result = await this.envsenseService.getFanPumpMode(userid, areaid);
+        return result;
+    }
+
+    /**
+    * Change Current Mode
+    */
+
+    @Get('user/:userid/plantarea/:areaid/light/mode/:mode')
+    async changeLightMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string,
+        @Param('mode') mode: string,
+        @Res() res
+    ) {
+        let result: Promise<string> = this.envsenseService.changeLightMode(userid, areaid, mode);
+        if (await result == "400") res.status(400).send("Bad Request");
+        else if (await result == "200") res.status(200).send("OK");
+        else if (await result == "500") res.status(500).send("Internal Server Error");
+    }
+
+    @Get('user/:userid/plantarea/:areaid/fanpump/mode/:mode')
+    async changeFanPumpMode(
+        @Param('userid') userid: string,
+        @Param('areaid') areaid: string,
+        @Param('mode') mode: string,
+        @Res() res
+    ) {
+        let result: Promise<string> = this.envsenseService.changeFanPumpMode(userid, areaid, mode);
+        if (await result == "400") res.status(400).send("Bad Request");
+        else if (await result == "200") res.status(200).send("OK");
+        else if (await result == "500") res.status(500).send("Internal Server Error");
+    }
 
     /*
      * Ex: http://127.0.0.1:3000/envsense/user/65f0529c5933e074166715a5/plantarea/65f0529c5933e074166715a8/light/turnon/1
@@ -143,20 +205,6 @@ export class EnvsenseController {
         if (result) res.status(200).send('OK');
         else res.status(403).send('Forbidden: manual mode is off');
     }
-
-    @Get('user/:userid/plantarea/:areaid/light/mode/:mode')
-    async changeLightMode(
-        @Param('userid') userid: string,
-        @Param('areaid') areaid: string,
-        @Param('mode') mode: string,
-        @Res() res
-    ) {
-        let result: Promise<string>  = this.envsenseService.changeLightMode(userid, areaid, mode);
-        if (await result == "400") res.status(400).send("Bad Request");
-        else if (await result == "200") res.status(200).send("OK");
-        else if (await result == "500") res.status(500).send("Internal Server Error");
-    }
-
 
     @Get('user/:userid/plantarea/:areaid/fanpump/turnon/:turnon')
     async turnOnFanPump(

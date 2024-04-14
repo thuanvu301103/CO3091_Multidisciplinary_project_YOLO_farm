@@ -18,6 +18,7 @@ import { Ke_hoachSchema } from '../schemas/ke_hoach.schema';
 		])
 	],
 	controllers: [EnvsenseController],
-	providers: [EnvsenseService]
+	providers: [EnvsenseService],
+	exports: [EnvsenseService]
 })
 export class EnvsenseModule {}

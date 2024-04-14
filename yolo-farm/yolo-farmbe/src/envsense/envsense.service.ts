@@ -13,8 +13,6 @@ import { Ke_hoach } from '../schemas/ke_hoach.schema';
 
 export class EnvsenseService {
 
-    private fe_url = "https://127.0.0.1:3001";
-
     public mqtt_client;
 
     /**
@@ -55,6 +53,11 @@ export class EnvsenseService {
         this.mqtt_client.on('error', (err) => {
             console.error('Adafruit IO MQTT error:', err);
         });
+    }
+
+    // Get mqtt connection
+    public getMqttConnection() {
+        return this.mqtt_client;
     }
 
     // Send updated data to fe server
@@ -274,7 +277,7 @@ export class EnvsenseService {
     public async changeAutomaticMode(userid: string, areaid: string, turnon: number) {
         try {
             let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
-            console.log(area.ma_feed_automatic);
+            //console.log(area.ma_feed_automatic);
             // send upadate message
             const response = await axios.post(`https://io.adafruit.com/api/v2/${area.ma_feed_automatic}/data`, {
                 value: turnon
@@ -285,12 +288,10 @@ export class EnvsenseService {
             });
             console.log(response.data); // Handle response data here
 
-            let result = null;
-            if (turnon == 1) result = this.changeLightMode(userid, areaid, "tu dong");
-            else result = this.changeLightMode(userid, areaid, "thu cong");
-            /*
-                Change other mode
-            */
+            if (turnon == 1)
+                await this.Khu_cay_trongModel.updateOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }, { $set: { che_do_tu_dong: true } }).exec();
+            else
+                await this.Khu_cay_trongModel.updateOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }, { $set: { che_do_tu_dong: false } }).exec();
 
             return true;
         } catch (error) {
@@ -378,6 +379,19 @@ export class EnvsenseService {
         }
     }
 
+    // Get light mode
+    public async getLightMode(userid: string, areaid: string) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            //console.log("Light Mode: ", area['che_do_anh_sang']);
+            return area['che_do_anh_sang'];
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return 0;
+            // Handle error here
+        }
+    }
+
     // Change light mode
     public async changeLightMode(userid: string, areaid: string, mode: string) {
         try {
@@ -434,7 +448,36 @@ export class EnvsenseService {
         }
     }
 
-    // Update Light button's change
+    // Get fan + pump mode
+    public async getFanPumpMode(userid: string, areaid: string) {
+        try {
+            let area = await this.Khu_cay_trongModel.findOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }).exec()
+            //console.log("Light Mode: ", area['che_do_anh_sang']);
+            return area['che_do_nhiet_am'];
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return 0;
+            // Handle error here
+        }
+    }
+
+    // Change fan + pump mode
+    public async changeFanPumpMode(userid: string, areaid: string, mode: string) {
+        try {
+            let valid_modes = ["tu dong", "thu cong", "theo lich"];
+            if (!(valid_modes.includes(mode))) return "400";
+
+            await this.Khu_cay_trongModel.updateOne({ $and: [{ nguoi_dung_id: userid }, { _id: areaid }] }, { $set: { che_do_nhiet_am: mode } }).exec()
+
+            return "200";
+        } catch (error) {
+            console.error('Error sending data to Adafruit:', error);
+            return "500";
+            // Handle error here
+        }
+    }
+
+    // Update fan + pump button's change
     public async updateFanPumpButtonChange(feed_name: string, feed_type: string, curr_val: number) {
         let area = await this.Khu_cay_trongModel.findOne({ ma_feed_nutnhan_maybom: feed_name }).exec();
         let user_id = area.nguoi_dung_id;

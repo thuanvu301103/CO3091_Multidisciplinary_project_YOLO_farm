@@ -38,6 +38,9 @@ export class Khu_cay_trong {
 
     @Prop()
     che_do_nhiet_am: string;
+
+    @Prop()
+    che_do_tu_dong: boolean;
 }
 
 export const Khu_cay_trongSchema = SchemaFactory.createForClass(Khu_cay_trong);

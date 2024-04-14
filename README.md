@@ -130,7 +130,7 @@ bootstrap();
 - The headers and content of HTTP messages must be in specific format. The content musst be in format ```"data:" + JSON data string + "\n\n"``` 
 ```typescript
 // file: envense.controller.ts
-	@Get()
+	@Get('user/:userid/streamevent')
 	async streamEvent(@Res() res) {
 		// Set up HTTP header for stream Event
 		res.setHeader('Content-Type', 'text/event-stream');
@@ -161,6 +161,7 @@ bootstrap();
 
 ### API Doc
 #### About the SSE message that be-server sends to fe-server whenerver there is change in adafruit server:
+- Url: ```/envsense/user/{user_id}/streamevent```
 - Message format:
 ```
 {
@@ -301,13 +302,18 @@ Both dynamic route parameters and query parameters are fully compatible with the
       }
     ```
 
-#### API for usecase 2: Supervise the plant area
+#### API for usecase 2: Supervise Light Relay for plant area
+- Get current Light relay state (on or off)
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/state```  
+  + Response: 1 for on; 0 for off
 - Send signal to turn off or on light relay
   + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/turnon/{turnon}```. With ```turnon === 1``` means turn on the light relay; ```turnon === 0``` means turn off the light.
   + Response: 
 	> Successed: {200: "OK"}
 	> Failed: {403: "Forbidden: manual mode is off"}
-
+- Get current Light mode
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/getmode```  
+  + Response: "thu cong" or "theo lich"
 - Change light mode
   + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/mode/{mode}```. With ```mode``` equals ```tu dong``` or ```thu cong``` or ```theo lich```.
   + Response: 
@@ -316,7 +322,25 @@ Both dynamic route parameters and query parameters are fully compatible with the
 		{500: "Internal Server Error"}
 		{400: "Bad Request"}
 
-
+#### API for usecase 3: Supervise Fan+Pump for plant area
+- Get current Fan + Pump relay state (on or off)
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/fanpump/state```  
+  + Response: 1 for on; 0 for off
+- Send signal to turn off or on fan + pump relay
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/fanpump/turnon/{turnon}```. With ```turnon === 1``` means turn on the relay; ```turnon === 0``` means turn off the relay.
+  + Response: 
+	> Successed: {200: "OK"}
+	> Failed: {403: "Forbidden: manual mode is off"}
+- Get current Fan + Pump mode
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/fabpump/getmode```  
+  + Response: "thu cong" or "theo lich"
+- Change light mode
+  + Url: ```/envense/user/{userid}/plantarea/{areaid}/light/mode/{mode}```. With ```mode``` equals ```tu dong``` or ```thu cong``` or ```theo lich```.
+  + Response: 
+	> Successed: {200: "OK"}
+	> Failed: 
+		{500: "Internal Server Error"}
+		{400: "Bad Request"}
 
 ## Config YOLO-Farm frontend server ```yolo-farmfe```
 ### Define routs
@@ -443,11 +467,13 @@ export default App;
     		);
 ```
 
+###
+
 ### Sitemap:
 - ```http://localhost:3001/user/{userid}/area/list```: list of plant area of a user with specific userid
 - ```http://localhost:3001/user/{userid}/area/{areaid}```: detail of plant area of a user with specific userid and areaid
 - ```http://localhost:3001/user/{userid}/area/{areaid}/history```: history of plant area of a user with specific userid and areaid
 
-
-userid = 65f0529c5933e074166715a5
-areaid = 65f0529c5933e074166715a8
+Example: 
+- userid = 65f0529c5933e074166715a5
+- areaid = 65f0529c5933e074166715a8
