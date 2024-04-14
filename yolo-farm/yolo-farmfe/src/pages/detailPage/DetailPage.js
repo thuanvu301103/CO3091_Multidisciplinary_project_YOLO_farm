@@ -251,45 +251,47 @@ export function DetailPage(){
 
                     {/* Card 1: Light */}
                     <div className="col-span-4">
-                        <Card
-                            shadow={false}
-                            className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
-                        >
-                            <CardHeader
-                                floated={false}
+                        <Link to={`/user/${userid}/area/${areaid}/lightschedule`}>
+                            <Card
                                 shadow={false}
-                                color="transparent"
-                                className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
-                                style={{ background: `url(${LightImg})`, filter: 'brightness(30%)' }}
+                                className="relative grid w-full max-w-[28rem] items-end justify-center overflow-hidden text-center py-5"
                             >
-                                <div className="to-bg-black-10 absolute inset-0 h-full w-full " />
+                                <CardHeader
+                                    floated={false}
+                                    shadow={false}
+                                    color="transparent"
+                                    className="absolute inset-0 m-0 h-full w-full rounded-none bg-cover bg-center"
+                                    style={{ background: `url(${LightImg})`, filter: 'brightness(30%)' }}
+                                >
+                                    <div className="to-bg-black-10 absolute inset-0 h-full w-full " />
 
-                            </CardHeader>
-                            <CardBody className="relative py-14 px-6 md:px-12">
-                                <Typography
-                                    style={{ fontSize: '80px', color: '#C0D82B', fontWeight: 'bold' }}
-                                    className="mb-3 font-medium leading-[1.5]"
-                                >
-                                    {lightData && lightData.curent_value && `${lightData.curent_value}%`}
-                                </Typography>
-                                <Typography
-                                    variant="h3"
-                                    color="white"
-                                    className="mb-3 font-medium leading-[1.5]"
-                                >
-                                    Ánh sáng
-                                </Typography>
-                                <Typography variant="h6" className="mb-4 text-gray-400">
-                                    {lightData && lightData.low_warning && lightData.high_warning &&
-                                        `Khuyến nghị: từ ${lightData.low_warning}% đến ${lightData.high_warning}%`}
-                                </Typography>
-                                <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
-                                    {lightData && lightData.evaluate && lightData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {lightData.evaluate.toFixed(1)}%</span> : null}
-                                    {lightData && lightData.evaluate && lightData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới {(0 - lightData.evaluate).toFixed(1)}%</span> : null}
-                                    {lightData && lightData.evaluate == 0 ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
-                                </Button>
-                            </CardBody>
-                        </Card>
+                                </CardHeader>
+                                <CardBody className="relative py-14 px-6 md:px-12">
+                                    <Typography
+                                        style={{ fontSize: '80px', color: '#C0D82B', fontWeight: 'bold' }}
+                                        className="mb-3 font-medium leading-[1.5]"
+                                    >
+                                        {lightData && lightData.curent_value && `${lightData.curent_value}%`}
+                                    </Typography>
+                                    <Typography
+                                        variant="h3"
+                                        color="white"
+                                        className="mb-3 font-medium leading-[1.5]"
+                                    >
+                                        Ánh sáng
+                                    </Typography>
+                                    <Typography variant="h6" className="mb-4 text-gray-400">
+                                        {lightData && lightData.low_warning && lightData.high_warning &&
+                                            `Khuyến nghị: từ ${lightData.low_warning}% đến ${lightData.high_warning}%`}
+                                    </Typography>
+                                    <Button className="rounded-3xl" style={{ backgroundColor: 'rgb(255,255,255)' }}>
+                                        {lightData && lightData.evaluate && lightData.evaluate > 0 ? <span style={{ color: '#dc3545' }}>Cao hơn giới hạn trên {lightData.evaluate.toFixed(1)}%</span> : null}
+                                        {lightData && lightData.evaluate && lightData.evaluate < 0 ? <span style={{ color: '#dc3545' }}>Thấp hơn giới hạn dưới {(0 - lightData.evaluate).toFixed(1)}%</span> : null}
+                                        {lightData && lightData.evaluate == 0 ? <span style={{ color: '#28a745' }}>Tình trạng tốt</span> : null}
+                                    </Button>
+                                </CardBody>
+                            </Card>
+                        </Link>
                     </div>
                     {/* Card 2: Temperature */}
                     <div className="col-span-4">

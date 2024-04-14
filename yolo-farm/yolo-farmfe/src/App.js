@@ -6,6 +6,7 @@ import { DetailPage } from './pages/detailPage/DetailPage'
 import { DashboardPage } from './pages/dashboardPage/DashboardPage';
 import { LoginPage } from './pages/loginPage/LoginPage';
 import { HistoryPage } from "./pages/historyPage/HistoryPage";
+import {LightSchedulePage} from './pages/schedulePage/lightSchedulePage/LightSchedulePage';
 import {TempSchedulePage} from './pages/schedulePage/tempSchedulePage/TempSchedulePage';
 import { MidSchedulePage } from "./pages/schedulePage/midSchedulePage/MidSchedulePage";
 
@@ -43,6 +44,7 @@ function App() {
         <Route path='/login' element={<LoginPage/>}/>
         <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
         <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
+        <Route path='/user/:userid/area/:areaid/lightschedule' element={<LightSchedulePage/>}/>
         <Route path='/user/:userid/area/:areaid/tempschedule' element={<TempSchedulePage/>}/>
         <Route path='/user/:userid/area/:areaid/midschedule' element={<MidSchedulePage/>}/>
 
