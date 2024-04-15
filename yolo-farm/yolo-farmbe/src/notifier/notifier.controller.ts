@@ -5,7 +5,7 @@ import { NotifierService } from './notifier.service';
 export class NotifierController {
     constructor(private readonly notifierService: NotifierService) { }
 
-    @Get('user/:userid/notifier')
+    @Get('user/:userid/streamevent')
     async streamEvent(
         @Param('userid') userid: string,
         @Res() res
@@ -33,6 +33,7 @@ export class NotifierController {
             else if (detail.feed_name == 'ma_feed_nutnhan_maybom') return;
 
             else res_data = await this.notifierService.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate);
+            if (res_data['nguoi_dung_id'] != userid) return null;
             let content = null;
             if (res_data['evaluate'] != 0) {
                 // If the flag is not on then set flag
@@ -55,7 +56,7 @@ export class NotifierController {
                         //return threads[thread_num];
                         //return thread_num;
                         content = threads[thread_num];
-                        res.write("data: Notifier" + JSON.stringify(content) + "\n\n");
+                        res.write("data:" + JSON.stringify(content) + "\n\n");
 
                     }, 0.2 * 60 * 1000); // 2 minutes = 2 * 60 seconds * 1000 milliseconds
                 }
@@ -63,13 +64,6 @@ export class NotifierController {
                 return null;
             }
             return null;
-
-            /*let result = await this.notifierService.catchdata(res_data, threads, timecount_flag, 0.2);
-            const finalres = result;
-            await setTimeout(async () => {
-                console.log(finalres);
-                res.write("data: Notifier" + JSON.stringify(threads[finalres]) + "\n\n");
-            }, 0.5 * 60 * 1000);*/
             
         });
     }

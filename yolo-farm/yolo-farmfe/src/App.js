@@ -11,6 +11,9 @@ import { MidSchedulePage } from "./pages/schedulePage/midSchedulePage/MidSchedul
 import {DashboardPageManager } from "./pages/dashboardPageManager/DashboardPageManager";
 import { DetailPageManager } from "./pages/detailPageManager/DetailPageManager";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -29,9 +32,8 @@ function App() {
     const [userrole, setUserRole] = useState('');
     const [userid, setUserId] = useState('65f0529c5933e074166715a5');
 
-    const [tempData, setTempData] = useState(null);
-    const [lightData, setLightData] = useState(null);
-    const [midData, setMidData] = useState(null);
+    const [notifyData, setNotifyData] = useState(null);
+    const [checkDupData, setCheckDupData] = useState(null);
 
     const handleLogin = (username, user_role, user_id) => {
         setUsername(username);
@@ -46,33 +48,66 @@ function App() {
         setLoggedIn(false);
     }
 
+    const showToastMessage = (notify_data) => {
+
+        toast.error(notify_data['data'], {
+            position: "bottom-left", // Use string value for position directly
+            autoClose: false,
+            onClick: () => {
+                // Redirect to example.com when the notification is clicked
+                window.location.href = notify_data['link'];
+            },
+        });
+    };
+
     // Start to hear from be user when Usẻ has aldready logged in
-    // Handle SSE messages from be-server
+    // Handle SSE noyify messages from be-server
     useEffect(() => {
         const fetchData = async (userid) => {
             try {
-                const eventSource = new EventSource(`http://127.0.0.1:3000/envsense/user/${userid}/streamevent`); // Create a connection to be-server then maintain it in time
+                const eventSource = new EventSource(`http://127.0.0.1:3000/notifier/user/${userid}/streamevent`); // Create a connection to be-server then maintain it in time
 
                 // Change value when changes occurred
-                eventSource.onmessage = (event) => {
+                eventSource.onmessage = async (event) => {
                     const eventData = JSON.parse(event.data);
-                    console.log('Received event:', eventData);
-                    if (eventData['feed_type'] === 'ma_feed_anh_sang') {
-                        setLightData(eventData);
-                    } else if (eventData['feed_type'] === 'ma_feed_nhiet_do') {
-                        setTempData(eventData);
-                    } else if (eventData['feed_type'] === 'ma_feed_do_am') {
-                        setMidData(eventData);
-                    }
-                    /*
-                    } else if (eventData['feed_type'] === 'ma_feed_nutnhan_den') {
-                        setLightRelayState(eventData['curent_value']);
-                    } else if (eventData['feed_type'] === 'ma_feed_nutnhan_maybom') {
-                        setFanPumpRelayState(eventData['curent_value']);
-                        console.log("Fan + Pump Relay State: ", eventData['curent_value'])
-                    }
-                    */
+                    //console.log('Received event:', eventData);
                     // Handle the received event data
+                    let temp_data_1 = "Cảnh báo";
+
+                    // feed type
+                    if (eventData['feed_type'] == 'ma_feed_nhiet_do') temp_data_1 += "nhiệt độ ";
+                    else if (eventData['feed_type'] == 'ma_feed_do_am') temp_data_1 += "độ ẩm ";
+                    else temp_data_1 += "ánh sáng ";
+
+                    // evaluate
+                    if (eventData['evaluate'] < 0) temp_data_1 += "quá thấp ";
+                    else if (eventData['evaluate'] > 0) temp_data_1 += "quá cao ";
+
+                    temp_data_1 += "nhưng không được điều chỉnh!";
+
+
+                    let temp_data_2 = "Chỉ số hện tại: ";
+                    temp_data_2 += eventData['curent_value'];
+                    
+
+                    // Location
+                    let temp_data_3 = "Mã khu cây trồng: " + eventData['id'];
+                    
+
+                    let notify_data = <div> {temp_data_1} <br /> {temp_data_2} <br /> {temp_data_3} </div>;
+                    let check_dup = temp_data_1 + temp_data_2 + temp_data_3;
+                    let user_id = eventData["nguoi_dung_id"];
+                    let area_id = eventData["id"];
+                    let redirect_link = `http://localhost:3001/user/${user_id}/area/${area_id}`;
+
+                    console.log("Check Dup:", checkDupData);
+                    // Avoid duplicate due to pasive listening
+                    if (check_dup != checkDupData) {
+                        
+                        await setNotifyData({ data: notify_data, link: redirect_link});
+                        await setCheckDupData(check_dup);
+                    }
+                    else return;
                 };
 
                 eventSource.onerror = (error) => {
@@ -91,28 +126,46 @@ function App() {
         // If logged in then start to listen SSE mesages
         if (loggedIn) {
             fetchData(userid);
-            console.log("Temp Data: ", tempData);
+            //console.log("Temp Data: ", tempData);
         } 
     }, [/*loggedIn*/]);
+
+
+    // Call showToastMessage to show notifier when notifyData change
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                showToastMessage(notifyData);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [notifyData]);
 
     return (
         <Router>
 
-
-            <Routes>
+            <div>
                 
-                {/*User Routes*/}
-                <Route path='/user/:userid/area/list' element={<DashboardPage/>}/>
-                <Route path='/login' element={<LoginPage/>}/>
-                <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
-                <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
-                <Route path='/user/:userid/area/:areaid/tempschedule' element={<TempSchedulePage/>}/>
-                <Route path='/user/:userid/area/:areaid/midschedule' element={<MidSchedulePage/>}/>
+                <ToastContainer />
+                <Routes>
+                
+                    {/*User Routes*/}
+                    <Route path='/user/:userid/area/list' element={<DashboardPage/>}/>
+                    <Route path='/login' element={<LoginPage/>}/>
+                    <Route path='/user/:userid/area/:areaid' element={<DetailPage/>}/>
+                    <Route path='/user/:userid/area/:areaid/history' element={<HistoryPage/>}/>
+                    <Route path='/user/:userid/area/:areaid/tempschedule' element={<TempSchedulePage/>}/>
+                    <Route path='/user/:userid/area/:areaid/midschedule' element={<MidSchedulePage/>}/>
 
-                {/*Manager Routes*/}
-                <Route path='/manager/:managerid/area/list' element={<DashboardPageManager/>}/>
-                <Route path='/manager/:managerid/area/:areaid' element={<DetailPageManager/>}/>
-            </Routes>
+                    {/*Manager Routes*/}
+                    <Route path='/manager/:managerid/area/list' element={<DashboardPageManager/>}/>
+                    <Route path='/manager/:managerid/area/:areaid' element={<DetailPageManager/>}/>
+                    </Routes>
+
+            </div>
         </Router>
     );
 }
