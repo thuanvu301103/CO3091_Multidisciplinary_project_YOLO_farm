@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { EnvsenseService } from '../envsense/envsense.service';
+import { Canh_bao } from '../schemas/canh_bao.schema';
+import { Nguoi_dung } from '../schemas/nguoi_dung.schema';
+import { Khu_cay_trong } from '../schemas/khu_cay_trong.schema';
+import { Ke_hoach } from '../schemas/ke_hoach.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 
 @Injectable()
@@ -7,8 +13,41 @@ export class NotifierService {
 
     public mqtt_client = null;
 
-    constructor(private readonly envsenseService: EnvsenseService) {
+    constructor(
+        private readonly envsenseService: EnvsenseService,
+        @InjectModel('Canh_bao') private readonly Canh_baoModel: Model<Canh_bao>,
+        @InjectModel('Nguoi_dung') private readonly Nguoi_dungModel: Model<Nguoi_dung>,
+        @InjectModel('Khu_cay_trong') private readonly Khu_cay_trongModel: Model<Khu_cay_trong>,
+        @InjectModel('Ke_hoach') private readonly Ke_hoachModel: Model<Ke_hoach>
+    ) {
         this.mqtt_client = envsenseService.getMqttConnection();
+
+        this.mqtt_client.on('message', async (topic, message) => {
+
+            let detail = await this.evaluateVal(topic, message);
+
+            // Handle the message as needed
+            
+            let res_data = null;
+
+            if (detail.feed_name == 'ma_feed_automatic') return;
+            else if (detail.feed_name == 'ma_feed_nutnhan_den') return;
+            else if (detail.feed_name == 'ma_feed_nutnhan_maybom') return;
+
+            else res_data = await this.updatePlantAreaChage(topic, detail.feed_name, message - 0, detail.evaluate);
+            
+            // Save notifier to database
+            let notify_data = {
+                nguoi_dung_id: res_data['nguoi_dung_id'],
+                khu_cay_trong_id: res_data['id'],
+                time: new Date(),
+                feed_type: detail.feed_name,
+                evaluate: detail.evaluate,
+                current_value: message - 0,
+                checked: false
+            };
+            await this.Canh_baoModel.create(notify_data);
+        });
 
     }
 
@@ -20,37 +59,11 @@ export class NotifierService {
         return this.envsenseService.updatePlantAreaChage(topic, feed_name, curr_val, evaluate);
     }
 
-    public async catchdata(res_data, threads, timecount_flag, time) {
-
-        if (res_data['evaluate'] != 0) {
-            // If the flag is not on then set flag
-            let thread_num = 0;
-            if (res_data['feed_type'] == 'ma_feed_nhiet_do') thread_num = 1;
-            else if (res_data['feed_type'] == 'ma_feed_do_am') thread_num = 2;
-            // Change the thread content 
-            threads[thread_num] = res_data;
-            if (timecount_flag[thread_num] == false) {
-                timecount_flag[thread_num] = true;
-                // Set time count
-                setTimeout(() => {
-                    // After 2 minutes, check the condition again
-                    console.log('Checking condition again after waiting...');
-                    if (threads[thread_num]['evaluate'] == 0) { return null; }
-                    
-                    console.log("After 2 minutes: ", timecount_flag[thread_num]);
-                    console.log("After 2 minutes: ", threads[thread_num]);
-                    timecount_flag[thread_num] = false;
-                    //return threads[thread_num];
-                    return thread_num;
-                }, time * 60 * 1000); // 2 minutes = 2 * 60 seconds * 1000 milliseconds
-            }
-            // else return null
-            return null;
-        }
-        return null;
-
+    public async getAllNotify(user_id) {
+        return await this.Canh_baoModel.find({ nguoi_dung_id: user_id }).exec();
     }
 
-
-
+    public async checkNotify(id, flag) {
+        await this.Canh_baoModel.updateOne({ _id: id }, { $set: { checked: flag } }).exec()
+    }
 }

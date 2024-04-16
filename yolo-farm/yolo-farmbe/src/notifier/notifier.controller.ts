@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Query, Res } from '@nestjs/common';
 import { NotifierService } from './notifier.service';
 
 @Controller('notifier')
@@ -67,5 +67,26 @@ export class NotifierController {
             
         });
     }
+
+    // Get all notifies
+    @Get('users/:userid/notifies')
+    async getAllNotify(
+        @Param('userid') userid: string
+    ) {
+        return this.notifierService.getAllNotify(userid);
+    }
+
+    // Check a notify
+    @Put('users/:userid/notifies/:notifyid/check/:checked')
+    async checkNotify(
+        @Param('notifyid') notifyid: string,
+        @Param('checked') checked: string
+    ) {
+        this.notifierService.checkNotify(notifyid, checked);
+    }
+
+
+
+
 }
 

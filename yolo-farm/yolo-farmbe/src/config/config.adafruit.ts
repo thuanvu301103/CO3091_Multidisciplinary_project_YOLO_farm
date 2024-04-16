@@ -2,7 +2,7 @@
 const username = 'vungocthuan1234';
 	
 // Adafruit account's Active key
-const activekey = 'a*i*o_QFm*X*69a*UL8vp*1327*HQ6K9WaV8Te4';
+const activekey = 'a*i*o_QFm*X69*aUL8vp1327HQ6K9WaV8Te4';
 
 // Feeds' names
 const feeds = [

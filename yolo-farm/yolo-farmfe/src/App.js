@@ -72,7 +72,7 @@ function App() {
                     const eventData = JSON.parse(event.data);
                     //console.log('Received event:', eventData);
                     // Handle the received event data
-                    let temp_data_1 = "Cảnh báo";
+                    let temp_data_1 = "Cảnh báo ";
 
                     // feed type
                     if (eventData['feed_type'] == 'ma_feed_nhiet_do') temp_data_1 += "nhiệt độ ";
