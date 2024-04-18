@@ -1,8 +1,51 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Button } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 import LoginImg from '../../assets/image/Login.jpg'
-export function LoginPage() {
+import { useNavigate } from "react-router-dom";
+
+export function LoginPage({ handleLoginfunc }) {
+    //const thishandleLoginfunc = handleLoginfunc;
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [errormessage, setErrorMessage] = useState(null);
+    const history = useNavigate();
+
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        //console.log("Input username: ", username);
+        //console.log("Input password: ", password);
+
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username, password: password }),
+            });
+
+            const resData = await response.json();
+            //console.log("Response Login: ", resData.userid);
+            if (resData.message === 'Login successful') {
+                // Authentication successful, redirect or handle success
+                setErrorMessage(null);
+                handleLoginfunc(resData.userid, resData.username, resData.role);
+                
+                // Redirect to another page in the same session:
+                if (resData.role == "user") history(`/user/${resData.userid}/area/list`);
+                
+            } else {
+                // Authentication failed, handle error
+                setErrorMessage('Invalid credentials');
+
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
   return (
     <div className="flex justify-center items-center bg-stone-50 max-md:px-5">
       <div className=" max-w-full bg-white w-full max-md:pl-5">
@@ -13,17 +56,21 @@ export function LoginPage() {
                 Đăng nhập
               </div>
               <div className="my-2">
-                <Input size="lg" label="Email" className="" />
+                              <Input size="lg" label="Username" onChange={(e) => setUsername(e.target.value)} />
               </div>
-              <div className="my-2">
-                <Input size="lg" label="Mật khẩu" className="" />
+                          <div className="my-2">
+                              <Input size="lg" label="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
               </div>
-              
-                <Link to="/" style={{width:'100%'}}>
-                    <Button fullWidth className="justify-center items-center px-7 py-3.5 mt-5 text-center text-white bg-blue-600 rounded-md leading-[150%] max-md:px-5">
-                        Đăng nhập
-                    </Button>
-                </Link>
+                          {errormessage ? (
+                              <div className="my-2" style={{ color: 'red' }}>
+                                  {errormessage}
+                              </div>) : null
+                          }
+                
+                          <Button fullWidth className="justify-center items-center px-7 py-3.5 mt-5 text-center text-white bg-blue-600 rounded-md leading-[150%] max-md:px-5"
+                              onClick={handleLogin}>
+                                Đăng nhập
+                          </Button>
               <div className="flex gap-5 justify-between mt-10">
                 <div className="text-gray-500 leading-[150%]">
                   Quên mật khẩu?

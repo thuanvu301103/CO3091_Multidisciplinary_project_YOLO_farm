@@ -10,7 +10,7 @@ import {
   PowerIcon,
 } from "@heroicons/react/24/solid";
  
-export function Sidebar() {
+export function Sidebar({ handleLogout }) {
   return (
     <Card className="h-full w-full max-w-[20rem] pt-4" style={{borderRadius:'0', padding:'40px 0'}}>
       <List style={{padding:'20px 0', minWidth:'100%'}}>
@@ -30,7 +30,8 @@ export function Sidebar() {
             Cài đặt
           </ListItem>
         </div>
-        <div style={{margin:'0 10px', borderRadius:'10px', backgroundColor:'#667A8A', color:'#FFFFFF'}}>
+              <div style={{ margin: '0 10px', borderRadius: '10px', backgroundColor: '#667A8A', color: '#FFFFFF' }}
+                  onClick={handleLogout}>
           <ListItem>
             <ListItemPrefix>
               <PowerIcon className="h-5 w-5" />

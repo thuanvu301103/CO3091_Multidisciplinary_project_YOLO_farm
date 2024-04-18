@@ -59,8 +59,26 @@ export class NotifierService {
         return this.envsenseService.updatePlantAreaChage(topic, feed_name, curr_val, evaluate);
     }
 
-    public async getAllNotify(user_id) {
-        return await this.Canh_baoModel.find({ nguoi_dung_id: user_id }).exec();
+    public async getNotifies(user_id, page, limit) {
+        const fetchNewestDocuments = async (pageNumber, limit) => {
+            const pageSize = limit; // Number of documents per page
+            const skipCount = (pageNumber - 1) * pageSize; // Calculate number of documents to skip
+
+            try {
+                // Fetch the newest documents sorted by createdAt in descending order (newest first)
+                const documents = await this.Canh_baoModel.find()
+                    .sort({ createdAt: -1 }) // Sort by createdAt field in descending order
+                    .skip(skipCount)
+                    .limit(pageSize).exec();
+
+                return documents;
+            } catch (error) {
+                console.error('Error fetching documents:', error);
+                throw error;
+            }
+        };
+
+        return await (await fetchNewestDocuments(page, limit)).reverse();
     }
 
     public async checkNotify(id, flag) {

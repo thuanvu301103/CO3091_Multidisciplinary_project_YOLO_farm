@@ -70,10 +70,12 @@ export class NotifierController {
 
     // Get all notifies
     @Get('users/:userid/notifies')
-    async getAllNotify(
-        @Param('userid') userid: string
+    async getNotifies(
+        @Param('userid') userid: string,
+        @Query('page') page: number,
+        @Query('limit') limit: number
     ) {
-        return this.notifierService.getAllNotify(userid);
+        return this.notifierService.getNotifies(userid, page, limit);
     }
 
     // Check a notify

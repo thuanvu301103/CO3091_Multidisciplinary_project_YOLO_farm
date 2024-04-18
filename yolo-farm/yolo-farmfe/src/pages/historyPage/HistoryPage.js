@@ -40,11 +40,7 @@ export function HistoryPage() {
 
     return (
         <>
-            <Header></Header>
-            <div className ="grid grid-cols-12">
-                <div className="col-span-2">
-                    <Sidebar></Sidebar>
-                </div>
+            
                 <div className="col-span-10 grid grid-cols-12 gap-6 m-6">
                     <div className="flex col-span-12 justify-between items-center" style={{width:'100%'}}>
                         <Typography
@@ -68,8 +64,7 @@ export function HistoryPage() {
                         <MoistureHistory></MoistureHistory>
                     </div>
                 </div>
-            </div>
-            <Footer></Footer>
+
         </>
     )
 }

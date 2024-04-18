@@ -6,9 +6,6 @@ import Grid from '@mui/material/Grid';
 import {Typography} from '@material-tailwind/react'
 import { DataGrid, GridToolbarQuickFilter, GridToolbar } from '@mui/x-data-grid';
 import { Link } from 'react-router-dom';
-import { Header } from "../../components/Navbar";
-import { Sidebar } from "../../components/Sidebar";
-import { Footer } from '../../components/Footer';
 import {DialogDelete} from "./DialogDelete";
 import {DialogUpdate} from "./DialogUpdate";
 import {DialogView} from "./DialogView";
@@ -103,14 +100,8 @@ export function DashboardPage() {
     () => data.columns.filter((column) => VISIBLE_FIELDS.includes(column.field)),
     [data.columns]
   );
-  return (
-    <>
-      <Header />
-      <div className="grid grid-cols-12">
-        <div className="col-span-2">
-          <Sidebar />
-        </div>
-        <div className="col-span-10 m-6">
+    return (
+        <div className="child-full-width gap-6 m-6">
             <div style = {{display:'flex', justifyContent: 'space-between', alignItems: "center", marginBottom: "20px"}}>
                 <div>
                     <Typography
@@ -126,6 +117,8 @@ export function DashboardPage() {
                     <Box id="filter-panel" />
                 </div>
             </div>
+
+            
             <Grid item style={{ height: 'calc(100vh - 250px)', width: '100%' }}>
               <DataGrid
                 rows={dataRows}
@@ -143,8 +136,5 @@ export function DashboardPage() {
               />
             </Grid>
         </div>
-      </div>
-      <Footer></Footer>
-    </>
   );
 }

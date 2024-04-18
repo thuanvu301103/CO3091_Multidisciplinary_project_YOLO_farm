@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
 
-import {Header} from "../../components/Navbar";
 import {Sidebar} from "../../components/Sidebar";
 import { Footer } from '../../components/Footer';
 import { Button, Switch } from "@material-tailwind/react";
@@ -250,11 +249,7 @@ export function DetailPage(){
  
     return (
         <>
-            <Header></Header>
-            <div className="grid grid-cols-12">
-                <div className="col-span-2">
-                    <Sidebar></Sidebar>
-                </div>
+            
                 <div className="col-span-10 grid grid-cols-12 gap-6 m-6">
                     <div className="flex col-span-12 justify-between items-center" style={{ width: '100%' }}>
                         <Typography
@@ -507,10 +502,17 @@ export function DetailPage(){
                                 </div>
 
                                 {/* Image */}
-                                <div className="flex justify-between items-center py-3">
-                                    <img src={fanrelayimg_state} alt="Dynamic Image" className=" w-full max-w-[18.5rem] h-full" />
-                                    <img src={pumprelayimg_state} alt="Dynamic Image" className=" w-full max-w-[18.5rem] h-full" />
+                            <div className="flex justify-between items-center py-3">
+                                <div className="py-3">
+                                    <img src={fanrelayimg_state} alt="Dynamic Image" className=" w-full h-full" />
                                 </div>
+                                <div className="px-12">
+                                    
+                                </div>
+                                <div className="py-3">
+                                    <img src={pumprelayimg_state} alt="Dynamic Image" className=" w-full h-full" />
+                                </div>
+                            </div>
 
                                 {/*Fan Pump relay switch*/}
                                 <div className="flex justify-center">
@@ -531,8 +533,7 @@ export function DetailPage(){
 
 
                 </div>
-            </div>
-            <Footer></Footer>
+
         </>
     );
 }
